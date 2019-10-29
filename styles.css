@@ -1,0 +1,17 @@
+.symbols {
+ display: flex;
+  flex-flow: column;
+  height: 100vh;
+
+}
+.logo {
+    width: 65px;
+}
+.vector {
+display: inline-flex;
+flex-flow: column;
+justify-content: space-around;
+height: 100vh;
+
+
+}
