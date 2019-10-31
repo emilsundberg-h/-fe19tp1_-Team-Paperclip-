@@ -20,6 +20,28 @@
 
    </div>
 </div>
+
+    <article>
+        <header>
+            <h1 class="note-header" id="note-header">placeholder heading...</h1>
+        </header>
+        <section class="note-body" id="note-body"></section>
+    </article>
+
+    <script src="lib/tinymce/tinymce.min.js"></script>
+    <script>
+        tinymce.init({
+            selector: '#note-body',
+            toolbar: false,
+            menubar: false,
+            branding: false,
+            inline: true,
+            skin: 'oxide-dark',
+            plugins: 'quickbars',
+            quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote',
+            quickbars_insert_toolbar: 'quickimage quicktable'
+        });
+    </script>
     <script src="app.js"></script>
 </body>
 </html>
