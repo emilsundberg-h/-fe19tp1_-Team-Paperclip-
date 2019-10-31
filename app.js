@@ -147,3 +147,33 @@ const deleteNote = (noteId) => {
 // ############
 // 
 // ############
+
+// save note
+const saveNote = noteId => {
+    
+    if(noteId) {
+        let noteTitle = document.querySelector('#note-title').textContent; 
+        let noteBody = document.querySelector('#note-body').innerHTML;
+
+        updateNoteTitle(noteId, noteTitle);
+        updateNoteBody(noteId, noteBody);
+    }
+}
+
+// render note
+const renderNote = noteId => {
+
+    let note = readNote(noteId);
+
+    if(note) {
+        document.querySelector('#note-title').textContent = note.title;
+        document.querySelector('#note-body').innerHTML = note.body;
+
+        // TODO - render starred status
+
+        // TODO - render date
+
+        // update ID in DOM for currently viewed note
+        document.querySelector('article').setAttribute('data-id', note.id);
+    }
+}
