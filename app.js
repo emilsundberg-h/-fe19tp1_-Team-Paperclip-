@@ -30,14 +30,13 @@ const setCurrentNote = noteId => localStorage.setItem('currentNote', noteId);
 const getCurrentNote = () => localStorage.getItem('currentNote');
 
 // create note
-const createNote = (title = '', body = '', starred = false) => {
+const createNote = (body = '', starred = false) => {
 
     notesArray = getNotesArray();
 
     let note = {
         id: Date.now(), // this doubles as the created date
         lastUpdated: 0,
-        title,
         body,
         starred,
     }
@@ -73,26 +72,6 @@ const readNote = noteId => {
 
     } else {
         return notesArray[noteIndex];
-    }
-}
-
-// update note title
-const updateNoteTitle = (noteId, title) => {
-
-    noteIndex = getNoteIndex(noteId);
-
-    if(noteIndex === false) {
-
-    } else {
-
-        let note = notesArray[noteIndex];
-
-        note.title = title;
-        note.lastUpdated = Date.now();
-    
-        notesArray[noteIndex] = note;
-    
-        writeToNotesArray(notesArray);
     }
 }
 
