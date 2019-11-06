@@ -1,6 +1,6 @@
 :root {
   --primary-color: #8FA998;
-  --primary-text-color: #2a3746;
+  --primary-text-color: #222f3e;
   --background-grey: #f5f5f5;
   --border-color: #ddd;
   --toolbar-height: 40px;
@@ -70,9 +70,11 @@ body {
 }
 
 .note-toolbar {
-  background-color: var(--background-grey);
+  background-color: var(--primary-text-color);
   grid-column: 3 / 4;
   grid-row: 1 / 2;
+  margin-left: 0px;
+  padding-left: 20px;
 }
 
 .note-content {
@@ -80,8 +82,8 @@ body {
   grid-row: 2 / 3;
   max-width: 720px;
   width: 100%;
-  padding: 0 5%;
-  margin: 0 auto;
+  padding-left: 20px;
+  margin-left: 0px;
   box-sizing: border-box;
   display: flex;
   flex-flow: column;
