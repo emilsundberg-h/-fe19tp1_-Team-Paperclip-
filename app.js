@@ -2,15 +2,42 @@
 // local storage I/O
 // ############
 
+var fakeNotes = [{
+    id: Date.now(),
+    lastUpdated: 0,
+    body: "gfdfgfdgfdgdfgdfgfdgdfgdfgfd",
+    starred: false,
+}, {
+    id: Date.now(),
+    lastUpdated: 0,
+    body: "gfdfgfdgfdgdfgdfgfdgdfgdfgfd",
+    starred: false,
+}, {
+    id: Date.now(),
+    lastUpdated: 0,
+    body: "gfdfgfdgfdgdfgdfgfdgdfgdfgfd",
+    starred: false,
+}, {
+    id: Date.now(),
+    lastUpdated: 0,
+    body: "gfdfgfdgfdgdfgdfgfdgdfgdfgfd",
+    starred: true,
+}, {
+    id: Date.now(),
+    lastUpdated: 0,
+    body: "gfdfgfdgfdgdfgdfgfdgdfgdfgfd",
+    starred: true,
+}]
+
 // check for notes array and create it if not found
 const checkForNotesArray = () => {
 
-    if(localStorage.getItem('notes')) {
+    if (localStorage.getItem('notes')) {
         console.log('yay! found notes array');
     } else {
         notesArray = [];
         localStorage.setItem('notes', JSON.stringify(notesArray));
-        localStorage.getItem('notes') ? console.log('notes array created') : console.log('oh no.. something went wrong creating notes array...'); 
+        localStorage.getItem('notes') ? console.log('notes array created') : console.log('oh no.. something went wrong creating notes array...');
     }
 }
 
@@ -40,7 +67,7 @@ const createNote = (body = '', starred = false) => {
         body,
         starred,
     }
-    
+
     notesArray.push(note);
 
     writeToNotesArray(notesArray);
@@ -53,14 +80,14 @@ const getNoteIndex = noteId => {
 
     notesArray = getNotesArray();
 
-     let noteIndex = notesArray.map(function(note) {return note.id}).indexOf(noteId);
+    let noteIndex = notesArray.map(function (note) { return note.id }).indexOf(noteId);
 
-     if(noteIndex === -1) {
-         console.log('note NOT found...');
-         return false;
-     } else {
-         return noteIndex;
-     }
+    if (noteIndex === -1) {
+        console.log('note NOT found...');
+        return false;
+    } else {
+        return noteIndex;
+    }
 }
 
 // read note 
@@ -68,7 +95,7 @@ const readNote = noteId => {
 
     noteIndex = getNoteIndex(noteId);
 
-    if(noteIndex === false) {
+    if (noteIndex === false) {
 
     } else {
         return notesArray[noteIndex];
@@ -80,7 +107,7 @@ const updateNoteBody = (noteId, body) => {
 
     noteIndex = getNoteIndex(noteId);
 
-    if(noteIndex === false) {
+    if (noteIndex === false) {
 
     } else {
 
@@ -88,19 +115,19 @@ const updateNoteBody = (noteId, body) => {
 
         note.body = body;
         note.lastUpdated = Date.now();
-    
+
         notesArray[noteIndex] = note;
-    
+
         writeToNotesArray(notesArray);
     }
 }
 
 // toggle starred status
 const toggleStarredStatus = noteId => {
-    
+
     noteIndex = getNoteIndex(noteId);
 
-    if(noteIndex === false) {
+    if (noteIndex === false) {
 
     } else {
 
@@ -120,7 +147,7 @@ const deleteNote = (noteId) => {
 
     noteIndex = getNoteIndex(noteId);
 
-    if(noteIndex === false) {
+    if (noteIndex === false) {
 
     } else {
         notesArray.splice(noteIndex, 1);
@@ -134,10 +161,10 @@ const deleteNote = (noteId) => {
 
 // save note
 const saveNote = () => {
-    
+
     let noteId = getCurrentNote();
 
-    if(noteId) { 
+    if (noteId) {
         let noteBody = tinyMCE.activeEditor.getContent();
 
         updateNoteBody(noteId, noteBody);
@@ -149,7 +176,7 @@ const renderNote = noteId => {
 
     let note = readNote(noteId);
 
-    if(note) {
+    if (note) {
         tinyMCE.activeEditor.setContent(note.body);
 
         // TODO - render starred status in toolbar 
@@ -175,10 +202,10 @@ window.addEventListener('beforeunload', () => saveNote());
 const navbarIcons = document.querySelector('#navbar-icons');
 
 navbarIcons.addEventListener('click', (e) => {
-    
+
     let pressedElement = e.target.id;
 
-    if(pressedElement === 'new-note') {
+    if (pressedElement === 'new-note') {
 
         // before creating a new note... we save the existing
         saveNote();
@@ -193,15 +220,28 @@ navbarIcons.addEventListener('click', (e) => {
         tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
     }
 
-    if(pressedElement === 'browse-notes') {
+    if (pressedElement === 'browse-notes') {
         // do browse notes things
     }
 
-    if(pressedElement === 'statistics') {
+    if (pressedElement === 'statistics') {
         // do statistics things
     }
 
-    if(pressedElement === 'settings') {
+    if (pressedElement === 'settings') {
         // do settings things
     }
 });
+
+const printNotes = () => {
+    //let notes = getNotesArray()
+    //TODO Erik
+    let notes = fakeNotes
+    let list = document.getElementsByClassName("menu")[0]
+    list.innerHTML = ""
+    notes.forEach(function (element) {
+        note = element.body.substring(0, 24) + "...";
+        date = new Date(element.id).toISOString().slice(0, 10)
+        list.innerHTML += `<p>${date}: ${note}</p>`
+    })
+}
