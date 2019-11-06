@@ -23,6 +23,12 @@ const getNotesArray = () => JSON.parse(localStorage.getItem('notes'));
 // write to notes array
 const writeToNotesArray = (notesArray) => localStorage.setItem('notes', JSON.stringify(notesArray));
 
+// set currently viewed note ID
+const setCurrentNote = noteId => localStorage.setItem('currentNote', noteId);
+
+// get currently viewed note ID
+const getCurrentNote = () => localStorage.getItem('currentNote');
+
 // create note
 const createNote = (title = '', body = '', starred = false) => {
 
@@ -110,7 +116,6 @@ const updateNoteBody = (noteId, body) => {
     }
 }
 
-
 // toggle starred status
 const toggleStarredStatus = noteId => {
     
@@ -149,13 +154,13 @@ const deleteNote = (noteId) => {
 // ############
 
 // save note
-const saveNote = noteId => {
+const saveNote = () => {
     
-    if(noteId) {
-        let noteTitle = document.querySelector('#note-title').textContent; 
-        let noteBody = document.querySelector('#note-body').innerHTML;
+    let noteId = getCurrentNote();
 
-        updateNoteTitle(noteId, noteTitle);
+    if(noteId) { 
+        let noteBody = tinyMCE.activeEditor.getContent();
+
         updateNoteBody(noteId, noteBody);
     }
 }
@@ -166,14 +171,11 @@ const renderNote = noteId => {
     let note = readNote(noteId);
 
     if(note) {
-        document.querySelector('#note-title').textContent = note.title;
-        document.querySelector('#note-body').innerHTML = note.body;
+        tinyMCE.activeEditor.setContent(note.body);
 
-        // TODO - render starred status
+        // TODO - render starred status in toolbar 
 
-        // TODO - render date
-
-        // update ID in DOM for currently viewed note
-        document.querySelector('article').setAttribute('data-id', note.id);
+        // update ID in local storage for currently viewed noted
+        setCurrentNote(note.id);
     }
 }
