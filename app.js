@@ -27,7 +27,7 @@ const writeToNotesArray = (notesArray) => localStorage.setItem('notes', JSON.str
 const setCurrentNote = noteId => localStorage.setItem('currentNote', noteId);
 
 // get currently viewed note ID
-const getCurrentNote = () => localStorage.getItem('currentNote');
+const getCurrentNote = () => Number(localStorage.getItem('currentNote'));
 
 // create note
 const createNote = (body = '', starred = false) => {
@@ -129,7 +129,7 @@ const deleteNote = (noteId) => {
 }
 
 // ############
-// 
+// Event handlers
 // ############
 
 // save note
@@ -158,3 +158,50 @@ const renderNote = noteId => {
         setCurrentNote(note.id);
     }
 }
+
+// ############
+// Event listeners
+// ############
+
+const noteBody = document.querySelector('#note-body');
+
+// save note on input
+noteBody.addEventListener('input', () => saveNote());
+
+// save note before unload
+window.addEventListener('beforeunload', () => saveNote());
+
+
+const navbarIcons = document.querySelector('#navbar-icons');
+
+navbarIcons.addEventListener('click', (e) => {
+    
+    let pressedElement = e.target.id;
+
+    if(pressedElement === 'new-note') {
+
+        // before creating a new note... we save the existing
+        saveNote();
+
+        // then we create the new note (which returns its id)
+        let newNoteId = createNote('<h1>set a title?</h1><p>starting typing... 🖋️</p>');
+
+        // followed by rendering the new note
+        renderNote(newNoteId);
+
+        // Select the first h1
+        tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
+    }
+
+    if(pressedElement === 'browse-notes') {
+        // do browse notes things
+    }
+
+    if(pressedElement === 'statistics') {
+        // do statistics things
+    }
+
+    if(pressedElement === 'settings') {
+        // do settings things
+    }
+});

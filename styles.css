@@ -53,6 +53,7 @@ body {
   color: var(--primary-text-color);
   font-size: 30px;
   padding: 10px;
+  text-decoration: none;
 }
 
 .navbar a:hover,
@@ -112,6 +113,7 @@ body {
 
   .navbar-icons {
     flex-flow: row;
+    height: 100%;
   }
 
   .menu {
