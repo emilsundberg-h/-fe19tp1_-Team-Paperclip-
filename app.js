@@ -4,14 +4,14 @@
 
 tinymce.init({
     selector: '#note-body',
-    toolbar: 'bold italic strikethrough underline h2 h3 | bullist numlist blockquote image link',
+    toolbar: 'bold italic strikethrough underline h2 h3 | bullist numlist blockquote image link | print',
     fixed_toolbar_container: '#note-toolbar',
     toolbar_drawer: 'sliding',
     menubar: false,
     branding: false,
     inline: true,
     skin: 'oxide-dark',
-    plugins: 'lists image link',
+    plugins: 'lists image link print',
 });
 
 // ############
@@ -245,7 +245,7 @@ navbarIcons.addEventListener('click', (e) => {
 
 const listNotes = () => {
     //let notes = getNotesArray()
-    //TODO eventlistener styles sort Erik 
+    //TODO eventlistener styles sort three lines Erik 
     let notes = fakeNotes.sort();
     let list = document.querySelector(".notes-list");
     list.innerHTML = "";
@@ -254,7 +254,6 @@ const listNotes = () => {
         let noteBody = note.body;
 
         // parse body into text (based on html tags)
-
         var noteObject = new tinymce.html.DomParser().parse(noteBody)
         let noteHeading = noteObject.firstChild.firstChild.value
         let notePreview
@@ -280,7 +279,7 @@ const listNotes = () => {
         list.innerHTML +=
             `<li class="note-list-item" data-id:"${note.id}">
                 <h3 class="note-list-heading">${noteHeading}</h3>
-                <span class="note-list-date">${noteDate}: </span>
+                <span class="note-list-date">&nbsp;${noteDate}&nbsp;</span>
                 <span class="note-list-preview">${notePreview}</span>
             </li>`;
     })
