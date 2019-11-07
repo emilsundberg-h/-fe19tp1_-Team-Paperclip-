@@ -3,29 +3,29 @@
 // ############
 
 var fakeNotes = [{
-    id: Date.now(),
+    id: 1573103194910,
     lastUpdated: 0,
-    body: "gfdfgfdgfdgdfgdfgfdgdfgdfgfd",
+    body: '<p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Repellendus, vero consequatur nihil in quas voluptas inventore fugit nostrum impedit veniam hic dolore, architecto quos, exercitationem dolorem minima laudantium explicabo illo?</p>',
     starred: false,
 }, {
-    id: Date.now(),
+    id: 1572199011597,
     lastUpdated: 0,
-    body: "gfdfgfdgfdgdfgdfgfdgdfgdfgfd",
+    body: '<h1>Repellendus, vero consequatur nihil</h1> <p>In quas voluptas inventore fugit nostrum impedit veniam hic dolore, architecto quos, exercitationem dolorem minima laudantium explicabo illo?</p>',
     starred: false,
 }, {
-    id: Date.now(),
+    id: 1572000011597,
     lastUpdated: 0,
-    body: "gfdfgfdgfdgdfgdfgfdgdfgdfgfd",
+    body: '<h1>Duis aute irure dolor in reprehenderit</h1> <p>In voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>',
     starred: false,
 }, {
-    id: Date.now(),
-    lastUpdated: 0,
-    body: "gfdfgfdgfdgdfgdfgfdgdfgdfgfd",
+    id: 1572106271597,
+    lastUpdated: 1572106271598,
+    body: '<h1>Repellendus, vero consequatur</h1> <p>Nihil in quas voluptas inventore fugit nostrum impedit veniam hic dolore, architecto quos, exercitationem dolorem minima laudantium explicabo illo?</p>',
     starred: true,
 }, {
-    id: Date.now(),
+    id: 1571101251597,
     lastUpdated: 0,
-    body: "gfdfgfdgfdgdfgdfgfdgdfgdfgfd",
+    body: '<h1>Lorem ipsum dolor sit amet</h1><p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>',
     starred: true,
 }]
 
@@ -221,7 +221,7 @@ navbarIcons.addEventListener('click', (e) => {
     }
 
     if (pressedElement === 'browse-notes') {
-        // do browse notes things
+        listNotes();
     }
 
     if (pressedElement === 'statistics') {
@@ -233,15 +233,51 @@ navbarIcons.addEventListener('click', (e) => {
     }
 });
 
-const printNotes = () => {
+const listNotes = () => {
     //let notes = getNotesArray()
     //TODO Erik
-    let notes = fakeNotes
-    let list = document.getElementsByClassName("menu")[0]
-    list.innerHTML = ""
-    notes.forEach(function (element) {
-        note = element.body.substring(0, 24) + "...";
-        date = new Date(element.id).toISOString().slice(0, 10)
-        list.innerHTML += `<p>${date}: ${note}</p>`
+    let notes = fakeNotes.sort();
+    let list = document.querySelector(".notes-list");
+    list.innerHTML = "";
+
+    notes.forEach(note => {
+        let noteBody = note.body;
+
+        // parse body into array (based on html tags)
+
+
+        // get note heading
+        let noteHeading;
+
+        if (noteBody[1] == "h") {
+            // get first element (h1, h2 p w/e)
+            noteHeading = noteBody.substring(noteBody.indexOf('>') + 1, noteBody.indexOf('</'));
+            // newNote = `${note.substring(note.indexOf('<p>') + 3, 70)}`;
+        }
+        else {
+            // if enclosing tag found, take the first word
+            noteHeading = noteBody.substring(noteBody.indexOf('>') + 1, noteBody.indexOf(' '));
+            // newNote = `${note.substring(note.indexOf(' '))}`;
+        }
+
+        // 
+        let notePreview;
+
+        // get date
+        let noteDate;
+
+        if (!note.lastUpdated) {
+            noteDate = new Date(note.id).toISOString().slice(0, 10);
+        } else {
+            noteDate = new Date(note.lastUpdated).toISOString().slice(0, 10);
+        }
+
+        // print HTML
+        list.innerHTML +=
+            `<li class="note-list-item" data-id:"${note.id}">
+                <h3 class="note-list-heading">${noteHeading}</h3>
+                <span class="note-list-date">${noteDate}: </span>
+                <span class="note-list-preview">${notePreview}</span>
+            </li>`;
     })
 }

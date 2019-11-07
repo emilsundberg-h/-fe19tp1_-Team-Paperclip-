@@ -94,6 +94,36 @@ body {
   height: 100%;
 }
 
+.notes-list {
+  font-size: 14px;
+  display: inline-block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.note-list-item {
+  border-bottom: 1px solid var(--border-color);
+  padding: 8px;
+  height: 42px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.note-list-heading {
+    text-overflow: ellipsis; 
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.note-list-preview {
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 @media only screen and (max-width: 768px) {
 
   body {
@@ -130,5 +160,33 @@ body {
 
   .note-toolbar {
     grid-column: 1 / 2;
+  }
+}
+@media print {
+  @page {
+    size: auto;  margin: 0mm;
+  }
+  body {
+    display: block;
+    font-size: 12pt;
+    margin: 2cm;
+  }
+    .menu {
+  display: none;
+    }
+  .navbar-icons {
+    display: none;
+  }
+    .navbar-logo {
+  display: none;
+    }
+  .note-content {
+    min-width: 100%;
+  }
+  .note-toolbar {
+    display: none;
+  }
+  #header {
+    display: none;
   }
 }
