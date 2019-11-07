@@ -1,4 +1,20 @@
 // ############
+// TinyMCE
+// ############
+
+tinymce.init({
+    selector: '#note-body',
+    toolbar: 'bold italic strikethrough underline h2 h3 | bullist numlist blockquote image link',
+    fixed_toolbar_container: '#note-toolbar',
+    toolbar_drawer: 'sliding',
+    menubar: false,
+    branding: false,
+    inline: true,
+    skin: 'oxide-dark',
+    plugins: 'lists image link',
+});
+
+// ############
 // local storage I/O
 // ############
 
