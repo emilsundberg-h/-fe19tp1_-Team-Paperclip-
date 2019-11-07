@@ -10,7 +10,7 @@ var fakeNotes = [{
 }, {
     id: 1572199011597,
     lastUpdated: 0,
-    body: '<h1>Repellendus, vero consequatur nihil</h1> <p>In quas voluptas inventore fugit nostrum impedit veniam hic dolore, architecto quos, exercitationem dolorem minima laudantium explicabo illo?</p>',
+    body: '<h1>Rubrik rubrik</h1> <p>Första stycket in quas voluptas inventore fugit nostrum impedit veniam hic dolore, architecto quos, exercitationem dolorem minima laudantium explicabo illo?</p><h1>Repellendus, vero consequatur nihil</h1>',
     starred: false,
 }, {
     id: 1572000011597,
@@ -235,7 +235,7 @@ navbarIcons.addEventListener('click', (e) => {
 
 const listNotes = () => {
     //let notes = getNotesArray()
-    //TODO Erik
+    //TODO eventlistener styles sort Erik 
     let notes = fakeNotes.sort();
     let list = document.querySelector(".notes-list");
     list.innerHTML = "";
@@ -243,25 +243,19 @@ const listNotes = () => {
     notes.forEach(note => {
         let noteBody = note.body;
 
-        // parse body into array (based on html tags)
+        // parse body into text (based on html tags)
 
+        var noteObject = new tinymce.html.DomParser().parse(noteBody)
+        let noteHeading = noteObject.firstChild.firstChild.value
+        let notePreview
 
         // get note heading
-        let noteHeading;
-
-        if (noteBody[1] == "h") {
-            // get first element (h1, h2 p w/e)
-            noteHeading = noteBody.substring(noteBody.indexOf('>') + 1, noteBody.indexOf('</'));
-            // newNote = `${note.substring(note.indexOf('<p>') + 3, 70)}`;
+        if (noteObject.firstChild.next) {
+            notePreview = noteObject.firstChild.next.firstChild.value
+        } else {
+            notePreview = noteHeading.substring(noteHeading.indexOf(' '));
+            noteHeading = noteHeading.substring(0, noteHeading.indexOf(' '))
         }
-        else {
-            // if enclosing tag found, take the first word
-            noteHeading = noteBody.substring(noteBody.indexOf('>') + 1, noteBody.indexOf(' '));
-            // newNote = `${note.substring(note.indexOf(' '))}`;
-        }
-
-        // 
-        let notePreview;
 
         // get date
         let noteDate;
