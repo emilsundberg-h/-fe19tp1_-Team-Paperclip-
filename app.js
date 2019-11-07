@@ -80,7 +80,7 @@ const getNoteIndex = noteId => {
 
     notesArray = getNotesArray();
 
-    let noteIndex = notesArray.map(function (note) { return note.id }).indexOf(noteId);
+    let noteIndex = notesArray.findIndex(note => note.id === noteId);
 
     if (noteIndex === -1) {
         console.log('note NOT found...');
@@ -110,13 +110,10 @@ const updateNoteBody = (noteId, body) => {
     if (noteIndex === false) {
 
     } else {
-
         let note = notesArray[noteIndex];
 
         note.body = body;
         note.lastUpdated = Date.now();
-
-        notesArray[noteIndex] = note;
 
         writeToNotesArray(notesArray);
     }
@@ -130,13 +127,10 @@ const toggleStarredStatus = noteId => {
     if (noteIndex === false) {
 
     } else {
-
         let note = notesArray[noteIndex];
 
         note.starred = !note.starred;
         note.lastUpdated = Date.now();
-
-        notesArray[noteIndex] = note;
 
         writeToNotesArray(notesArray);
     }
@@ -195,8 +189,8 @@ const noteBody = document.querySelector('#note-body');
 // save note on input
 noteBody.addEventListener('input', () => saveNote());
 
-// save note before unload
-window.addEventListener('beforeunload', () => saveNote());
+// save note before unload (unessecary since we save on input)
+// window.addEventListener('beforeunload', () => saveNote());
 
 
 const navbarIcons = document.querySelector('#navbar-icons');
@@ -216,7 +210,7 @@ navbarIcons.addEventListener('click', (e) => {
         // followed by rendering the new note
         renderNote(newNoteId);
 
-        // Select the first h1
+        // and last we select the generated h1
         tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
     }
 
