@@ -245,25 +245,36 @@ navbarIcons.addEventListener('click', (e) => {
 
 const listNotes = () => {
     //let notes = getNotesArray()
-    //TODO eventlistener styles sort three lines Erik 
+    //TODO eventlistener Erik 
     let notes = fakeNotes.sort();
     let list = document.querySelector(".notes-list");
     list.innerHTML = "";
+
+    //split string every every nth (splitLength) space to array 
+    const splitMyString = (str, splitLength) => {
+        var a = str.split(' '), b = [];
+        while (a.length) b.push(a.splice(0, splitLength).join(' '));
+        return b;
+    }
+
+    //sorts note by date (id)
+    notes.sort((a, b) => Number(b.id) - Number(a.id));
 
     notes.forEach(note => {
         let noteBody = note.body;
 
         // parse body into text (based on html tags)
-        var noteObject = new tinymce.html.DomParser().parse(noteBody)
+        let noteObject = new tinymce.html.DomParser().parse(noteBody)
         let noteHeading = noteObject.firstChild.firstChild.value
         let notePreview
 
-        // get note heading
+        // get note heading and preview (body)
         if (noteObject.firstChild.next) {
             notePreview = noteObject.firstChild.next.firstChild.value
         } else {
-            notePreview = noteHeading.substring(noteHeading.indexOf(' '));
-            noteHeading = noteHeading.substring(0, noteHeading.indexOf(' '))
+            let splitHeading = splitMyString(noteHeading, 3)
+            noteHeading = splitHeading[0];
+            notePreview = splitHeading[1] + splitHeading[2];
         }
 
         // get date
@@ -278,8 +289,8 @@ const listNotes = () => {
         // print HTML
         list.innerHTML +=
             `<li class="note-list-item" data-id:"${note.id}">
-                <h3 class="note-list-heading">${noteHeading}</h3>
                 <span class="note-list-date">&nbsp;${noteDate}&nbsp;</span>
+                <h3 class="note-list-heading">${noteHeading}</h3>
                 <span class="note-list-preview">${notePreview}</span>
             </li>`;
     })
