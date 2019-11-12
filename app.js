@@ -57,6 +57,7 @@ tinymce.init({
 // ############
 // local storage I/O
 // ############
+//let notesArray = [];
 
 var fakeNotes = [{
     id: 1573103194910,
@@ -177,11 +178,11 @@ const updateNoteBody = (noteId, body) => {
 
 // toggle starred status
 const toggleStarredStatus = noteId => {
-
+    
     noteIndex = getNoteIndex(noteId);
-
+    console.log(notesArray)
     if (noteIndex === false) {
-
+        
     } else {
         let note = notesArray[noteIndex];
 
@@ -251,6 +252,17 @@ const notesList = document.querySelector('#notes-list');
 notesList.addEventListener('click', (e) => {
 
     let noteId;
+
+    noteId = Number(e.target.closest("li").dataset.id)
+
+    if (e.target.classList.contains("fa-star")) {
+       toggleStarredStatus(noteId);
+   }
+   console.log(noteId)
+    
+
+
+ 
 
     if (e.target.tagName === 'LI') {
 
@@ -357,7 +369,7 @@ const listNotes = () => {
         // print HTML
 
             list.innerHTML +=
-            `<li class="note-list-item" data-id:"${note.id}">
+            `<li class="note-list-item" data-id="${note.id}">
             <span class="note-list-date">&nbsp;${noteDate}&nbsp;</span> <i class="${note.starred ? "fas" : "far"} fa-star"></i>
             <h3 class="note-list-heading">${noteHeading}</h3>
             <span class="note-list-preview">${notePreview}</span></li>`; 
