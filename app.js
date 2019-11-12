@@ -57,34 +57,6 @@ tinymce.init({
 // ############
 // local storage I/O
 // ############
-//let notesArray = [];
-
-var fakeNotes = [{
-    id: 1573103194910,
-    lastUpdated: 1573103194910,
-    body: '<p></p><p>Lorem ipsum, </p><p>sdsvs xcvdsv</p>',
-    starred: false,
-}, {
-    id: 1572199011597,
-    lastUpdated: 1573566035771,
-    body: '<h1>Rubrik rubrik</h1> <p>Första stycket in quas voluptas inventore fugit nostrum impedit veniam hic dolore, architecto quos, exercitationem dolorem minima laudantium explicabo illo?</p><h1>Repellendus, vero consequatur nihil</h1>',
-    starred: false,
-}, {
-    id: 1572000011597,
-    lastUpdated: 1572000011597,
-    body: '<h1>Duis aute irure dolor in reprehenderit</h1> <p>In voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>',
-    starred: false,
-}, {
-    id: 1572106271597,
-    lastUpdated: 1572106271598,
-    body: '<h1>Repellendus, vero consequatur</h1> <p>Nihil in quas voluptas inventore fugit nostrum impedit veniam hic dolore, architecto quos, exercitationem dolorem minima laudantium explicabo illo?</p>',
-    starred: true,
-}, {
-    id: 1571101251597,
-    lastUpdated: 1571101251597,
-    body: '<h1>Lorem ipsum dolor sit amet</h1><p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>',
-    starred: true,
-}]
 
 // check for notes array and create it if not found
 const checkForNotesArray = () => {
@@ -92,7 +64,7 @@ const checkForNotesArray = () => {
     if (localStorage.getItem('notes')) {
         console.log('yay! found notes array');
     } else {
-        notesArray = [];
+        let notesArray = [];
         localStorage.setItem('notes', JSON.stringify(notesArray));
         localStorage.getItem('notes') ? console.log('notes array created') : console.log('oh no.. something went wrong creating notes array...');
     }
@@ -116,7 +88,7 @@ const getCurrentNote = () => Number(localStorage.getItem('currentNote'));
 // create note
 const createNote = (body = '', starred = false) => {
 
-    notesArray = getNotesArray();
+    let notesArray = getNotesArray();
 
     let note = {
         id: Date.now(), // this doubles as the created date
@@ -135,7 +107,7 @@ const createNote = (body = '', starred = false) => {
 // get array index of a note
 const getNoteIndex = noteId => {
 
-    notesArray = getNotesArray();
+    notesArray = getNotesArray(); // not using "let" somehow makes this a global variable
 
     let noteIndex = notesArray.findIndex(note => note.id === noteId);
 
@@ -150,7 +122,7 @@ const getNoteIndex = noteId => {
 // read note 
 const readNote = noteId => {
 
-    noteIndex = getNoteIndex(noteId);
+    let noteIndex = getNoteIndex(noteId);
 
     if (noteIndex === false) {
 
@@ -162,7 +134,7 @@ const readNote = noteId => {
 // update note body
 const updateNoteBody = (noteId, body) => {
 
-    noteIndex = getNoteIndex(noteId);
+    let noteIndex = getNoteIndex(noteId);
 
     if (noteIndex === false) {
 
@@ -179,8 +151,8 @@ const updateNoteBody = (noteId, body) => {
 // toggle starred status
 const toggleStarredStatus = noteId => {
     
-    noteIndex = getNoteIndex(noteId);
-    console.log(notesArray)
+    let noteIndex = getNoteIndex(noteId);
+
     if (noteIndex === false) {
         
     } else {
@@ -196,7 +168,7 @@ const toggleStarredStatus = noteId => {
 // delete note
 const deleteNote = (noteId) => {
 
-    noteIndex = getNoteIndex(noteId);
+    let noteIndex = getNoteIndex(noteId);
 
     if (noteIndex === false) {
 
@@ -230,8 +202,6 @@ const renderNote = noteId => {
     if (note) {
         tinyMCE.activeEditor.setContent(note.body);
 
-        // TODO - render starred status in toolbar 
-
         // update ID in local storage for currently viewed noted
         setCurrentNote(note.id);
     }
@@ -251,35 +221,22 @@ const notesList = document.querySelector('#notes-list');
 
 notesList.addEventListener('click', (e) => {
 
-    let noteId;
+    // look up id of clicked note
+    let noteId = Number(e.target.closest("li").dataset.id)
 
-    noteId = Number(e.target.closest("li").dataset.id)
-
+    // toggle starred status if star is pressed
     if (e.target.classList.contains("fa-star")) {
+        
        toggleStarredStatus(noteId);
-   }
-   console.log(noteId)
-    
 
+       renderNotesList();
 
- 
-
-    if (e.target.tagName === 'LI') {
-
-        noteId = Number(e.target.dataset.id);
-
+    // else just render the note
     } else {
 
-        noteId = Number(e.target.parentElement.dataset.id);
-    }
-
-    if (noteId) {
-
-        // render the new note
         renderNote(noteId);
 
-        // re-render notes lists
-        listNotes();
+        renderNotesList();
     }
 });
 
@@ -302,11 +259,11 @@ navbarIcons.addEventListener('click', (e) => {
         tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
 
         // re-render the notes list
-        listNotes();
+        renderNotesList();
     }
 
     if (pressedElement === 'browse-notes') {
-        listNotes();
+        renderNotesList();
     }
 
     if (pressedElement === 'statistics') {
@@ -318,7 +275,21 @@ navbarIcons.addEventListener('click', (e) => {
     }
 });
 
-const listNotes = () => {
+// load note content on page load
+window.addEventListener('load', (e) => {
+
+    let noteId = getCurrentNote();
+
+    renderNote(noteId);
+
+    renderNotesList();
+});
+
+// ############
+// 
+// ############
+
+const renderNotesList = () => {
     let notes = getNotesArray();
     let list = document.querySelector(".notes-list");
     list.innerHTML = "";
