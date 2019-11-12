@@ -231,15 +231,41 @@ const renderNote = noteId => {
 // Event listeners
 // ############
 
+// note body
 const noteBody = document.querySelector('#note-body');
 
-// save note on input
 noteBody.addEventListener('input', () => saveNote());
 
-// save note before unload (unessecary since we save on input)
-// window.addEventListener('beforeunload', () => saveNote());
+// notes list
+const notesList = document.querySelector('#notes-list');
 
+notesList.addEventListener('click', (e) => {
 
+    let noteId;
+
+    if (e.target.tagName === 'LI') {
+
+        noteId = Number(e.target.dataset.id);
+
+    } else {
+
+        noteId = Number(e.target.parentElement.dataset.id);
+    }
+
+    if (noteId) {
+
+        // save current note
+        saveNote();
+
+        // render the new note
+        renderNote(noteId);
+
+        // re-render notes lists
+        listNotes();
+    }
+});
+
+// navbar
 const navbarIcons = document.querySelector('#navbar-icons');
 
 navbarIcons.addEventListener('click', (e) => {
@@ -257,8 +283,11 @@ navbarIcons.addEventListener('click', (e) => {
         // followed by rendering the new note
         renderNote(newNoteId);
 
-        // and last we select the generated h1
+        // we then select the generated h1
         tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
+
+        // re-render the notes list
+        listNotes();
     }
 
     if (pressedElement === 'browse-notes') {
@@ -275,9 +304,9 @@ navbarIcons.addEventListener('click', (e) => {
 });
 
 const listNotes = () => {
-    //let notes = getNotesArray()
+    let notes = getNotesArray();
     //TODO eventlistener Erik 
-    let notes = fakeNotes.sort();
+    // let notes = fakeNotes.sort();
     let list = document.querySelector(".notes-list");
     list.innerHTML = "";
 
@@ -319,7 +348,7 @@ const listNotes = () => {
 
         // print HTML
         list.innerHTML +=
-            `<li class="note-list-item" data-id:"${note.id}">
+            `<li class="note-list-item" data-id="${note.id}">
                 <span class="note-list-date">&nbsp;${noteDate}&nbsp;</span>
                 <h3 class="note-list-heading">${noteHeading}</h3>
                 <span class="note-list-preview">${notePreview}</span>
