@@ -4,7 +4,7 @@
 
 tinymce.init({
     selector: '#note-body',
-    toolbar: 'bold italic strikethrough underline h2 h3 | bullist numlist blockquote image link print wordcount |',
+    toolbar: 'bold italic strikethrough underline h2 h3 | bullist numlist blockquote image link print wordcount Template |',
     fixed_toolbar_container: '#note-toolbar',
     toolbar_drawer: 'sliding',
     menubar: false,
@@ -12,7 +12,16 @@ tinymce.init({
     inline: true,
     skin: 'oxide-dark',
     plugins: 'lists image code link print textpattern wordcount',
-
+    
+    setup: (editor) => {
+        editor.ui.registry.addButton('Template', {
+           icon:'template.svg',
+           tooltip:'template Note',
+           id:'template-buttton',
+           stateSelector:'test-clas',
+          onAction: () => alert('Button clicked!')
+        });
+      },
     //file picker image
     image_title: true, 
     // enable automatic uploads of images represented by blob or data URIs
@@ -322,7 +331,7 @@ const listNotes = () => {
 
     notes.forEach(note => {
         let noteBody = note.body;
-
+        console.log(note.starred);
         // parse body into text (based on html tags)
         let noteObject = new tinymce.html.DomParser().parse(noteBody)
         let noteHeading = noteObject.firstChild.firstChild.value
@@ -345,16 +354,19 @@ const listNotes = () => {
         } else {
             noteDate = new Date(note.lastUpdated).toISOString().slice(0, 10);
         }
-
         // print HTML
-        list.innerHTML +=
-            `<li class="note-list-item" data-id="${note.id}">
-                <span class="note-list-date">&nbsp;${noteDate}&nbsp;</span>
-                <h3 class="note-list-heading">${noteHeading}</h3>
-                <span class="note-list-preview">${notePreview}</span>
-            </li>`;
+
+            list.innerHTML +=
+            `<li class="note-list-item" data-id:"${note.id}">
+            <span class="note-list-date">&nbsp;${noteDate}&nbsp;</span> <i class="${note.starred ? "fas" : "far"} fa-star"></i>
+            <h3 class="note-list-heading">${noteHeading}</h3>
+            <span class="note-list-preview">${notePreview}</span></li>`; 
+
     })
 }
+// white star: ☆
+// black star: ★
+
 
 var checkbox = document.querySelector('input[name=theme]');
 
@@ -374,3 +386,24 @@ var checkbox = document.querySelector('input[name=theme]');
                 document.documentElement.classList.remove('transition')
             }, 1000)
         }
+        const favorite = function() {
+                
+                let favoriteArray = []
+
+                let notesArray = getNotesArray();
+            
+            
+                console.log(notesArray);
+            
+                for(i = 0;i<notesArray.length; i++){
+            
+                    // console.log(notesArray);
+            
+                    if(notesArray[i].starred===true){
+                        console.log("you have" + [i] + "favorites");
+            
+
+            
+                    }
+             }                    
+            }
