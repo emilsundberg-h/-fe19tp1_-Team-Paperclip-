@@ -23,34 +23,34 @@ tinymce.init({
         });
       },
     //file picker image
-    image_title: true, 
+    image_title: true,
     // enable automatic uploads of images represented by blob or data URIs
     automatic_uploads: true,
     // add custom filepicker only to Image dialog
     file_picker_types: 'image',
-    file_picker_callback: function(cb, value, meta) {
-      var input = document.createElement('input');
-      input.setAttribute('type', 'file');
-      input.setAttribute('accept', 'image/*');
-  
-      input.onchange = function() {
-        var file = this.files[0];
-        var reader = new FileReader();
-        
-        reader.onload = function () {
-          var id = 'blobid' + (new Date()).getTime();
-          var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
-          var base64 = reader.result.split(',')[1];
-          var blobInfo = blobCache.create(id, file, base64);
-          blobCache.add(blobInfo);
-  
-          // call the callback and populate the Title field with the file name
-          cb(blobInfo.blobUri(), { title: file.name });
+    file_picker_callback: function (cb, value, meta) {
+        var input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+
+        input.onchange = function () {
+            var file = this.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function () {
+                var id = 'blobid' + (new Date()).getTime();
+                var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                var base64 = reader.result.split(',')[1];
+                var blobInfo = blobCache.create(id, file, base64);
+                blobCache.add(blobInfo);
+
+                // call the callback and populate the Title field with the file name
+                cb(blobInfo.blobUri(), { title: file.name });
+            };
+            reader.readAsDataURL(file);
         };
-        reader.readAsDataURL(file);
-      };
-      
-      input.click();
+
+        input.click();
     }
 });
 
@@ -61,17 +61,17 @@ tinymce.init({
 
 var fakeNotes = [{
     id: 1573103194910,
-    lastUpdated: 0,
-    body: '<p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Repellendus, vero consequatur nihil in quas voluptas inventore fugit nostrum impedit veniam hic dolore, architecto quos, exercitationem dolorem minima laudantium explicabo illo?</p>',
+    lastUpdated: 1573103194910,
+    body: '<p></p><p>Lorem ipsum, </p><p>sdsvs xcvdsv</p>',
     starred: false,
 }, {
     id: 1572199011597,
-    lastUpdated: 0,
+    lastUpdated: 1573566035771,
     body: '<h1>Rubrik rubrik</h1> <p>Första stycket in quas voluptas inventore fugit nostrum impedit veniam hic dolore, architecto quos, exercitationem dolorem minima laudantium explicabo illo?</p><h1>Repellendus, vero consequatur nihil</h1>',
     starred: false,
 }, {
     id: 1572000011597,
-    lastUpdated: 0,
+    lastUpdated: 1572000011597,
     body: '<h1>Duis aute irure dolor in reprehenderit</h1> <p>In voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>',
     starred: false,
 }, {
@@ -81,7 +81,7 @@ var fakeNotes = [{
     starred: true,
 }, {
     id: 1571101251597,
-    lastUpdated: 0,
+    lastUpdated: 1571101251597,
     body: '<h1>Lorem ipsum dolor sit amet</h1><p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>',
     starred: true,
 }]
@@ -120,7 +120,7 @@ const createNote = (body = '', starred = false) => {
 
     let note = {
         id: Date.now(), // this doubles as the created date
-        lastUpdated: 0,
+        lastUpdated: Date.now(), // same as created initially, used to sort notes 
         body,
         starred,
     }
@@ -275,9 +275,6 @@ notesList.addEventListener('click', (e) => {
 
     if (noteId) {
 
-        // save current note
-        saveNote();
-
         // render the new note
         renderNote(noteId);
 
@@ -294,9 +291,6 @@ navbarIcons.addEventListener('click', (e) => {
     let pressedElement = e.target.id;
 
     if (pressedElement === 'new-note') {
-
-        // before creating a new note... we save the existing
-        saveNote();
 
         // then we create the new note (which returns its id)
         let newNoteId = createNote('<h1>set a title?</h1><p>starting typing... 🖋️</p>');
@@ -326,8 +320,6 @@ navbarIcons.addEventListener('click', (e) => {
 
 const listNotes = () => {
     let notes = getNotesArray();
-    //TODO eventlistener Erik 
-    // let notes = fakeNotes.sort();
     let list = document.querySelector(".notes-list");
     list.innerHTML = "";
 
@@ -338,26 +330,35 @@ const listNotes = () => {
         return b;
     }
 
-    //sorts note by date (id)
-    notes.sort((a, b) => Number(b.id) - Number(a.id));
+    notes.sort((a, b) => Number(b.lastUpdated) - Number(a.lastUpdated));
 
     notes.forEach(note => {
         let noteBody = note.body;
-        console.log(note.starred);
+        let noteHeading
+        let notePreview = ""
         // parse body into text (based on html tags)
         let noteObject = new tinymce.html.DomParser().parse(noteBody)
-        let noteHeading = noteObject.firstChild.firstChild.value
-        let notePreview
+        if (noteObject.firstChild.firstChild.value !== " ") {
+            noteHeading = noteObject.firstChild.firstChild.value
+        } else if (noteObject.firstChild.next) {
+            noteHeading = noteObject.firstChild.next.firstChild.value
+        } else {
+            noteHeading = "Empty"
+        }
 
         // get note heading and preview (body)
-        if (noteObject.firstChild.next) {
+        if (noteObject.firstChild.next && noteHeading !== noteObject.firstChild.next.firstChild.value) {
             notePreview = noteObject.firstChild.next.firstChild.value
         } else {
             let splitHeading = splitMyString(noteHeading, 3)
             noteHeading = splitHeading[0];
-            notePreview = splitHeading[1] + splitHeading[2];
+            for (i = 1; i < splitHeading.length; i++) {
+                notePreview += splitHeading[i];
+            }
         }
-
+        if (notePreview === "") {
+            notePreview = `<i>Write some text here</i>`
+        }
         // get date
         let noteDate;
 
@@ -382,40 +383,19 @@ const listNotes = () => {
 
 var checkbox = document.querySelector('input[name=theme]');
 
-        checkbox.addEventListener('change', function() {
-            if(this.checked) {
-                trans()
-                document.documentElement.setAttribute('data-theme', 'dark')
-            } else {
-                trans()
-                document.documentElement.setAttribute('data-theme', 'light')
-            }
-        })
+checkbox.addEventListener('change', function () {
+    if (this.checked) {
+        trans()
+        document.documentElement.setAttribute('data-theme', 'dark')
+    } else {
+        trans()
+        document.documentElement.setAttribute('data-theme', 'light')
+    }
+})
 
-        let trans = () => {
-            document.documentElement.classList.add('transition');
-            window.setTimeout(() => {
-                document.documentElement.classList.remove('transition')
-            }, 1000)
-        }
-        const favorite = function() {
-                
-                let favoriteArray = []
-
-                let notesArray = getNotesArray();
-            
-            
-                console.log(notesArray);
-            
-                for(i = 0;i<notesArray.length; i++){
-            
-                    // console.log(notesArray);
-            
-                    if(notesArray[i].starred===true){
-                        console.log("you have" + [i] + "favorites");
-            
-
-            
-                    }
-             }                    
-            }
+let trans = () => {
+    document.documentElement.classList.add('transition');
+    window.setTimeout(() => {
+        document.documentElement.classList.remove('transition')
+    }, 1000)
+}
