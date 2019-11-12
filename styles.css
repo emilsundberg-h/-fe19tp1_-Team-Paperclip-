@@ -186,7 +186,7 @@ body {
   body {
     display: block;
     font-size: 12pt;
-    margin: 2cm;
+    padding: 15mm;
   }
     .menu {
   display: none;
