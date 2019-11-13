@@ -207,6 +207,73 @@ const renderNote = noteId => {
     }
 }
 
+// render notes list
+const renderNotesList = () => {
+
+    let notesArray = getNotesArray();
+
+    let notesList = document.querySelector(".notes-list");
+    notesList.innerHTML = "";
+
+    //split string every every nth (splitLength) space to array 
+    const splitMyString = (str, splitLength) => {
+        var a = str.split(' '), b = [];
+        while (a.length) b.push(a.splice(0, splitLength).join(' '));
+        return b;
+    }
+
+    // sort the array based on last updated date
+    notesArray.sort((a, b) => Number(b.lastUpdated) - Number(a.lastUpdated));
+
+    notesArray.forEach(note => {
+        let noteBody = note.body;
+        let noteHeading = '';
+        let notePreview = '';
+
+        // parse body into text (based on html tags)
+        let noteObject = new tinymce.html.DomParser().parse(noteBody);
+
+        if (noteObject.firstChild.firstChild.value !== " ") {
+            noteHeading = noteObject.firstChild.firstChild.value
+        } else if (noteObject.firstChild.next) {
+            noteHeading = noteObject.firstChild.next.firstChild.value
+        } else {
+            noteHeading = "Empty"
+        }
+
+        // get note heading and preview (body)
+        if (noteObject.firstChild.next && noteHeading !== noteObject.firstChild.next.firstChild.value) {
+            notePreview = noteObject.firstChild.next.firstChild.value
+        } else {
+            let splitHeading = splitMyString(noteHeading, 3)
+            noteHeading = splitHeading[0];
+            for (i = 1; i < splitHeading.length; i++) {
+                notePreview += splitHeading[i];
+            }
+        }
+        
+        // set preview text to a deafult if not found
+        if (notePreview === "") {
+            notePreview = `<i>nothing to preview...</i>`
+        }
+
+        // get date
+        let noteDate = new Date(note.lastUpdated).toISOString().slice(0, 10);
+        let noteDateISO = new Date(note.lastUpdated).toISOString();
+
+        // print HTML
+        notesList.innerHTML +=
+        `<li class="note-list-item" data-id="${note.id}">
+            <div class="note-list-meta-container">
+                <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
+                <i class="${note.starred ? "fas" : "far"} fa-star"></i>
+            </div>
+            <h2 class="note-list-heading">${noteHeading}</h2>
+            <span class="note-list-preview">${notePreview}</span>
+        </li>`; 
+    });
+}
+
 // ############
 // Event listeners
 // ############
@@ -288,69 +355,6 @@ window.addEventListener('load', (e) => {
 // ############
 // 
 // ############
-
-const renderNotesList = () => {
-    let notes = getNotesArray();
-    let list = document.querySelector(".notes-list");
-    list.innerHTML = "";
-
-    //split string every every nth (splitLength) space to array 
-    const splitMyString = (str, splitLength) => {
-        var a = str.split(' '), b = [];
-        while (a.length) b.push(a.splice(0, splitLength).join(' '));
-        return b;
-    }
-
-    notes.sort((a, b) => Number(b.lastUpdated) - Number(a.lastUpdated));
-
-    notes.forEach(note => {
-        let noteBody = note.body;
-        let noteHeading
-        let notePreview = ""
-        // parse body into text (based on html tags)
-        let noteObject = new tinymce.html.DomParser().parse(noteBody)
-        if (noteObject.firstChild.firstChild.value !== " ") {
-            noteHeading = noteObject.firstChild.firstChild.value
-        } else if (noteObject.firstChild.next) {
-            noteHeading = noteObject.firstChild.next.firstChild.value
-        } else {
-            noteHeading = "Empty"
-        }
-
-        // get note heading and preview (body)
-        if (noteObject.firstChild.next && noteHeading !== noteObject.firstChild.next.firstChild.value) {
-            notePreview = noteObject.firstChild.next.firstChild.value
-        } else {
-            let splitHeading = splitMyString(noteHeading, 3)
-            noteHeading = splitHeading[0];
-            for (i = 1; i < splitHeading.length; i++) {
-                notePreview += splitHeading[i];
-            }
-        }
-        if (notePreview === "") {
-            notePreview = `<i>Write some text here</i>`
-        }
-        // get date
-        let noteDate;
-
-        if (!note.lastUpdated) {
-            noteDate = new Date(note.id).toISOString().slice(0, 10);
-        } else {
-            noteDate = new Date(note.lastUpdated).toISOString().slice(0, 10);
-        }
-        // print HTML
-
-            list.innerHTML +=
-            `<li class="note-list-item" data-id="${note.id}">
-            <span class="note-list-date">&nbsp;${noteDate}&nbsp;</span> <i class="${note.starred ? "fas" : "far"} fa-star"></i>
-            <h3 class="note-list-heading">${noteHeading}</h3>
-            <span class="note-list-preview">${notePreview}</span></li>`; 
-
-    })
-}
-// white star: ☆
-// black star: ★
-
 
 var checkbox = document.querySelector('input[name=theme]');
 

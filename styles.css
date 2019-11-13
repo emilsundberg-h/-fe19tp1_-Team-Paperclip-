@@ -115,7 +115,6 @@ body {
 }
 
 .notes-list {
-  font-size: 14px;
   display: inline-block;
   width: 100%;
   padding: 0;
@@ -123,17 +122,9 @@ body {
   list-style: none;
 }
 
-.note-list-date{
-  font-size: 10px;
-  display: inline-block;
-  color: var(--secondary-text-color);
-  margin:0px;
-}
-
 .note-list-item {
   border-bottom: 1px solid var(--border-color);
   padding: 8px;
-  height: 63px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -144,7 +135,20 @@ body {
   cursor: pointer;
 }
 
+.note-list-meta-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.note-list-date {
+  font-size: 11px;
+  display: inline-block;
+  color: var(--secondary-text-color);
+}
+
 .note-list-heading {
+  font-size: 18px;
   text-overflow: ellipsis; 
   overflow: hidden;
   white-space: nowrap;
@@ -152,6 +156,7 @@ body {
 }
 
 .note-list-preview {
+  font-size: 14px;
   text-overflow: ellipsis; 
   overflow: hidden;
   color: var(--secondary-text-color);
