@@ -189,7 +189,7 @@ const getNoteDate = date => new Date(date).toISOString().slice(0, 10);
 const getNoteDateISO = date => new Date(date).toISOString();
 
 // parse note body
-const praseNoteBodyHTML = noteBody => {
+const parseNoteBodyHTML = noteBody => {
     // Create a new div element
     var temporalDivElement = document.createElement("div");
     // Set the HTML content with the providen
@@ -222,7 +222,7 @@ const getNotePreview = noteBody => {
     let notePreview;
 
     rows.forEach(function (row, i) {
-        if (row.length >= 1 && !notePreview) notePreview = rows[i + 1]
+        if (row.length >= 1 && !notePreview && rows[i + 1] !== ' ') notePreview = rows[i + 1]
     })
 
     if (!notePreview || notePreview === ' ') notePreview = '<i>No preview...</i>'
@@ -275,7 +275,7 @@ const renderNotesList = () => {
     notesArray.forEach(note => {
 
         // get note body object
-        let noteBody = praseNoteBodyHTML(note.body);
+        let noteBody = parseNoteBodyHTML(note.body);
 
         // get title
 
@@ -332,7 +332,7 @@ const updateNoteInNotesList = noteId => {
     }
 
     // get note body object
-    let noteBodyObject = praseNoteBodyHTML(note.body);
+    let noteBodyObject = parseNoteBodyHTML(note.body);
 
     // update title
     let noteTitle = getNoteTitle(noteBodyObject);
