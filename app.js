@@ -179,6 +179,62 @@ const deleteNote = (noteId) => {
 }
 
 // ############
+// Helper functions
+// ############
+
+// get note date in yyyy-mm-dd
+const getNoteDate = date => new Date(date).toISOString().slice(0, 10);
+
+// get note date ISO
+const getNoteDateISO = date => new Date(date).toISOString();
+
+// parse note body
+const praseNoteBodyHTML = noteBody => new tinymce.html.DomParser().parse(noteBody); 
+
+// get note title
+// TODO: fix bugs in the many possible edge cases
+const getNoteTitle = noteBodyObject => {
+
+    let noteTitle;
+
+    if (!noteBodyObject.firstChild) {
+
+        noteTitle = '<i>no title... 🙈</i>';
+
+    } else if (noteBodyObject.firstChild.firstChild.value === ' ') {
+
+        noteTitle = '<i>no title... 🙈</i>';
+        
+    } else {
+        noteTitle = noteBodyObject.firstChild.firstChild.value;
+    }
+
+    return noteTitle;
+}
+
+// get note preview
+// TODO: fix bugs in the many possible edge cases
+const getNotePreview = noteBodyObject => {
+
+    let notePreview;
+
+    if (!noteBodyObject.firstChild) {
+
+        notePreview = '<i>no preview... 👀</i>';
+
+    } else if (!noteBodyObject.firstChild.next) {
+
+        notePreview = '<i>no preview... 👀</i>';
+
+    } else {
+
+        notePreview = noteBodyObject.firstChild.next.firstChild.value;
+    }
+
+    return notePreview;
+}
+
+// ############
 // Event handlers
 // ############
 
@@ -213,65 +269,94 @@ const renderNotesList = () => {
     let notesArray = getNotesArray();
 
     let notesList = document.querySelector(".notes-list");
+
+    // clear notes list
     notesList.innerHTML = "";
 
-    //split string every every nth (splitLength) space to array 
-    const splitMyString = (str, splitLength) => {
-        var a = str.split(' '), b = [];
-        while (a.length) b.push(a.splice(0, splitLength).join(' '));
-        return b;
-    }
-
     // sort the array based on last updated date
-    notesArray.sort((a, b) => Number(b.lastUpdated) - Number(a.lastUpdated));
+    notesArray.sort((noteA, noteB) => Number(noteB.lastUpdated) - Number(noteA.lastUpdated));
 
     notesArray.forEach(note => {
-        let noteBody = note.body;
-        let noteHeading = '';
-        let notePreview = '';
 
-        // parse body into text (based on html tags)
-        let noteObject = new tinymce.html.DomParser().parse(noteBody);
+        // get note body object
+        let noteBodyObject = praseNoteBodyHTML(note.body);
 
-        if (noteObject.firstChild.firstChild.value !== " ") {
-            noteHeading = noteObject.firstChild.firstChild.value
-        } else if (noteObject.firstChild.next) {
-            noteHeading = noteObject.firstChild.next.firstChild.value
-        } else {
-            noteHeading = "Empty"
-        }
-
-        // get note heading and preview (body)
-        if (noteObject.firstChild.next && noteHeading !== noteObject.firstChild.next.firstChild.value) {
-            notePreview = noteObject.firstChild.next.firstChild.value
-        } else {
-            let splitHeading = splitMyString(noteHeading, 3)
-            noteHeading = splitHeading[0];
-            for (i = 1; i < splitHeading.length; i++) {
-                notePreview += splitHeading[i];
-            }
-        }
-        
-        // set preview text to a deafult if not found
-        if (notePreview === "") {
-            notePreview = `<i>nothing to preview...</i>`
-        }
+        // get title
+        let noteTitle = getNoteTitle(noteBodyObject);
+    
+        // get preview
+        let notePreview = getNotePreview(noteBodyObject);
 
         // get date
-        let noteDate = new Date(note.lastUpdated).toISOString().slice(0, 10);
-        let noteDateISO = new Date(note.lastUpdated).toISOString();
+        let noteDate = getNoteDate(note.lastUpdated);
+        let noteDateISO = getNoteDateISO(note.lastUpdated);
+
+        // get current note
+        let currentNote = getCurrentNote();
 
         // print HTML
         notesList.innerHTML +=
-        `<li class="note-list-item" data-id="${note.id}">
+        `<li class="note-list-item ${currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
             <div class="note-list-meta-container">
                 <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
                 <i class="${note.starred ? "fas" : "far"} fa-star"></i>
             </div>
-            <h2 class="note-list-heading">${noteHeading}</h2>
+            <h2 class="note-list-title">${noteTitle}</h2>
             <span class="note-list-preview">${notePreview}</span>
         </li>`; 
     });
+}
+
+// update note in notes list
+const updateNoteInNotesList = noteId => {
+
+    // get note from local storage
+    let note = readNote(noteId);
+
+    // find list item with matching id in DOM
+    const noteListItem = document.querySelector(`.notes-list > li[data-id="${note.id}"]`);
+
+    // update date
+    let noteDate = getNoteDate(note.lastUpdated);
+    let noteDateISO = getNoteDateISO(note.lastUpdated);
+
+    noteListItem.querySelector('time').textContent = noteDate;
+    noteListItem.querySelector('time').setAttribute('datetime', noteDateISO);
+
+    // update starred status
+    let noteStar = noteListItem.querySelector('.fa-star');
+
+    if (note.starred) {
+        noteStar.classList.add('fas');
+        noteStar.classList.remove('far');
+    } else {
+        noteStar.classList.add('far');
+        noteStar.classList.remove('fas');
+    }
+
+    // get note body object
+    let noteBodyObject = praseNoteBodyHTML(note.body);
+
+    // update title
+    let noteTitle = getNoteTitle(noteBodyObject);
+    
+    noteListItem.querySelector('.note-list-title').innerHTML = noteTitle;
+    
+    // update preview
+    let notePreview = getNotePreview(noteBodyObject);
+    
+    noteListItem.querySelector('.note-list-preview').innerHTML = notePreview;
+
+    // update current note status
+    let currentNote = getCurrentNote();
+
+    if (currentNote === note.id) {
+
+        let currentNoteItem = document.querySelector('.note-list-item-current');
+        currentNoteItem.classList.remove('note-list-item-current');
+
+        noteListItem.classList.add('note-list-item-current');
+    }
 }
 
 // ############
@@ -281,7 +366,17 @@ const renderNotesList = () => {
 // note body
 const noteBody = document.querySelector('#note-body');
 
-noteBody.addEventListener('input', () => saveNote());
+// TODO: listening for input is not the perfect solution to detect change
+// when e.g. deleting note content (crtl + a and delete/backspace)
+// look into tinymce API, other event listener or maybe mutationobserver
+noteBody.addEventListener('input', (e) => {
+    
+    saveNote();
+
+    let currentNote = getCurrentNote();
+
+    updateNoteInNotesList(currentNote);
+});
 
 // notes list
 const notesList = document.querySelector('#notes-list');
@@ -289,21 +384,27 @@ const notesList = document.querySelector('#notes-list');
 notesList.addEventListener('click', (e) => {
 
     // look up id of clicked note
-    let noteId = Number(e.target.closest("li").dataset.id)
+    let noteId = Number(e.target.closest("li").dataset.id);
 
     // toggle starred status if star is pressed
     if (e.target.classList.contains("fa-star")) {
         
        toggleStarredStatus(noteId);
 
-       renderNotesList();
+       updateNoteInNotesList(noteId);
 
     // else just render the note
     } else {
 
+        // we save and update the current note first to ensure no changes get lost.
+        // This because the input event listener does not detect all changes (TODO)
+        saveNote();
+        let currentNoteId = getCurrentNote();
+        updateNoteInNotesList(currentNoteId);
+
         renderNote(noteId);
 
-        renderNotesList();
+        updateNoteInNotesList(noteId);
     }
 });
 

@@ -135,6 +135,10 @@ body {
   cursor: pointer;
 }
 
+.note-list-item-current {
+  background: var(--border-color);
+}
+
 .note-list-meta-container {
   display: flex;
   justify-content: space-between;
@@ -147,7 +151,7 @@ body {
   color: var(--secondary-text-color);
 }
 
-.note-list-heading {
+.note-list-title {
   font-size: 18px;
   text-overflow: ellipsis; 
   overflow: hidden;
