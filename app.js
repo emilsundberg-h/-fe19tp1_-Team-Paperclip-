@@ -208,7 +208,7 @@ const getNoteTitle = noteBody => {
         if (row.length >= 1 && !noteTitle) noteTitle = row
     })
 
-    if (!noteTitle) noteTitle = 'No title...'
+    if (!noteTitle || noteTitle === ' ') noteTitle = 'No title...'
 
 
     return noteTitle
@@ -225,7 +225,7 @@ const getNotePreview = noteBody => {
         if (row.length >= 1 && !notePreview) notePreview = rows[i + 1]
     })
 
-    if (!notePreview || notePreview === ' ') notePreview = '<i>No preview...</i>'
+    if (!notePreview || notePreview === ' ') notePreview = '<i>No preview...</i>'
 
     return notePreview;
 }
