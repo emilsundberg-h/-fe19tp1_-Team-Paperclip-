@@ -12,16 +12,16 @@ tinymce.init({
     inline: true,
     skin: 'oxide-dark',
     plugins: 'lists image code link print textpattern wordcount',
-    
+
     setup: (editor) => {
         editor.ui.registry.addButton('Template', {
-           icon:'template.svg',
-           tooltip:'template Note',
-           id:'template-buttton',
-           stateSelector:'test-clas',
-          onAction: () => alert('Button clicked!')
+            icon: 'template.svg',
+            tooltip: 'template Note',
+            id: 'template-buttton',
+            stateSelector: 'test-clas',
+            onAction: () => alert('Button clicked!')
         });
-      },
+    },
     //file picker image
     image_title: true,
     // enable automatic uploads of images represented by blob or data URIs
@@ -150,11 +150,11 @@ const updateNoteBody = (noteId, body) => {
 
 // toggle starred status
 const toggleStarredStatus = noteId => {
-    
+
     let noteIndex = getNoteIndex(noteId);
 
     if (noteIndex === false) {
-        
+
     } else {
         let note = notesArray[noteIndex];
 
@@ -189,47 +189,43 @@ const getNoteDate = date => new Date(date).toISOString().slice(0, 10);
 const getNoteDateISO = date => new Date(date).toISOString();
 
 // parse note body
-const praseNoteBodyHTML = noteBody => new tinymce.html.DomParser().parse(noteBody); 
-
+const praseNoteBodyHTML = noteBody => {
+    // Create a new div element
+    var temporalDivElement = document.createElement("div");
+    // Set the HTML content with the providen
+    temporalDivElement.innerHTML = noteBody;
+    // Retrieve the text property of the element (cross-browser support)
+    return temporalDivElement.textContent || temporalDivElement.innerText || "";
+}
 // get note title
-// TODO: fix bugs in the many possible edge cases
-const getNoteTitle = noteBodyObject => {
+const getNoteTitle = noteBody => {
 
-    let noteTitle;
+    let rows = noteBody.split('\n');
 
-    if (!noteBodyObject.firstChild) {
+    let noteTitle
 
-        noteTitle = '<i>no title... 🙈</i>';
+    rows.forEach(function (row) {
+        if (row.length >= 1 && !noteTitle) noteTitle = row
+    })
 
-    } else if (noteBodyObject.firstChild.firstChild.value === ' ') {
+    if (!noteTitle) noteTitle = 'No title...'
 
-        noteTitle = '<i>no title... 🙈</i>';
-        
-    } else {
-        noteTitle = noteBodyObject.firstChild.firstChild.value;
-    }
 
-    return noteTitle;
+    return noteTitle
 }
 
 // get note preview
-// TODO: fix bugs in the many possible edge cases
-const getNotePreview = noteBodyObject => {
+const getNotePreview = noteBody => {
+
+    let rows = noteBody.split('\n');
 
     let notePreview;
 
-    if (!noteBodyObject.firstChild) {
+    rows.forEach(function (row, i) {
+        if (row.length >= 1 && !notePreview) notePreview = rows[i + 1]
+    })
 
-        notePreview = '<i>no preview... 👀</i>';
-
-    } else if (!noteBodyObject.firstChild.next) {
-
-        notePreview = '<i>no preview... 👀</i>';
-
-    } else {
-
-        notePreview = noteBodyObject.firstChild.next.firstChild.value;
-    }
+    if (!notePreview || notePreview === ' ') notePreview = '<i>No preview...</i>'
 
     return notePreview;
 }
@@ -279,13 +275,14 @@ const renderNotesList = () => {
     notesArray.forEach(note => {
 
         // get note body object
-        let noteBodyObject = praseNoteBodyHTML(note.body);
+        let noteBody = praseNoteBodyHTML(note.body);
 
         // get title
-        let noteTitle = getNoteTitle(noteBodyObject);
-    
+
+        let noteTitle = getNoteTitle(noteBody);
+
         // get preview
-        let notePreview = getNotePreview(noteBodyObject);
+        let notePreview = getNotePreview(noteBody);
 
         // get date
         let noteDate = getNoteDate(note.lastUpdated);
@@ -296,14 +293,14 @@ const renderNotesList = () => {
 
         // print HTML
         notesList.innerHTML +=
-        `<li class="note-list-item ${currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
+            `<li class="note-list-item ${currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
             <div class="note-list-meta-container">
                 <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
                 <i class="${note.starred ? "fas" : "far"} fa-star"></i>
             </div>
             <h2 class="note-list-title">${noteTitle}</h2>
             <span class="note-list-preview">${notePreview}</span>
-        </li>`; 
+        </li>`;
     });
 }
 
@@ -339,12 +336,12 @@ const updateNoteInNotesList = noteId => {
 
     // update title
     let noteTitle = getNoteTitle(noteBodyObject);
-    
+
     noteListItem.querySelector('.note-list-title').innerHTML = noteTitle;
-    
+
     // update preview
     let notePreview = getNotePreview(noteBodyObject);
-    
+
     noteListItem.querySelector('.note-list-preview').innerHTML = notePreview;
 
     // update current note status
@@ -370,7 +367,7 @@ const noteBody = document.querySelector('#note-body');
 // when e.g. deleting note content (crtl + a and delete/backspace)
 // look into tinymce API, other event listener or maybe mutationobserver
 noteBody.addEventListener('input', (e) => {
-    
+
     saveNote();
 
     let currentNote = getCurrentNote();
@@ -388,12 +385,12 @@ notesList.addEventListener('click', (e) => {
 
     // toggle starred status if star is pressed
     if (e.target.classList.contains("fa-star")) {
-        
-       toggleStarredStatus(noteId);
 
-       updateNoteInNotesList(noteId);
+        toggleStarredStatus(noteId);
 
-    // else just render the note
+        updateNoteInNotesList(noteId);
+
+        // else just render the note
     } else {
 
         // we save and update the current note first to ensure no changes get lost.
@@ -418,7 +415,7 @@ navbarIcons.addEventListener('click', (e) => {
     if (pressedElement === 'new-note') {
 
         // then we create the new note (which returns its id)
-        let newNoteId = createNote('<h1>set a title?</h1><p>starting typing... 🖋️</p>');
+        let newNoteId = createNote('<h1>set a title?</h1>\n<p>Start typing... 🖋️</p>');
 
         // followed by rendering the new note
         renderNote(newNoteId);
