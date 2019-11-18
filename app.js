@@ -383,6 +383,8 @@ notesList.addEventListener('click', (e) => {
     // look up id of clicked note
     let noteId = Number(e.target.closest("li").dataset.id);
 
+    console.log('the id:', noteId)
+
     // toggle starred status if star is pressed
     if (e.target.classList.contains("fa-star")) {
 
@@ -413,6 +415,9 @@ navbarIcons.addEventListener('click', (e) => {
     let pressedElement = e.target.id;
 
     if (pressedElement === 'new-note') {
+        document.querySelector("#nav-title").innerText = "Browse notes"
+        document.querySelector(".search-toolbar").style.display = "flex"
+
 
         // then we create the new note (which returns its id)
         let newNoteId = createNote('<h1>set a title?</h1>\n<p>Start typing... 🖋️</p>');
@@ -428,14 +433,25 @@ navbarIcons.addEventListener('click', (e) => {
     }
 
     if (pressedElement === 'browse-notes') {
+        document.querySelector("#nav-title").innerText = "Browse notes"
+        document.querySelector(".search-toolbar").style.display = "flex"
+
+
         renderNotesList();
     }
 
     if (pressedElement === 'statistics') {
+        document.querySelector("#nav-title").innerText = "Statistics"
+        document.querySelector(".search-toolbar").style.display = "none"
+
         // do statistics things
     }
 
     if (pressedElement === 'settings') {
+        document.querySelector("#nav-title").innerText = "Settings"
+        document.querySelector(".search-toolbar").style.display = "none"
+
+
         // do settings things
     }
 });
