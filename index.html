@@ -30,7 +30,7 @@
                 </svg>
             </a>
         </div>
-        <div class="navbar-icons" id="navbar-icons">
+        <div class="navbar-menu" id="navbar-menu">
             <a href="#" title="New note" id="new-note" class="fas fa-plus"></a>
             <a href="#" title="Browse notes" id="browse-notes" class="fas fa-folder"></a>
             <a href="#" title="Statistics" id="statistics" class="fas fa-chart-bar"></a>
@@ -40,8 +40,8 @@
     </nav>
 
     <aside class="menu">
-        <div class="notes-list-toolbar">
-            <span id="nav-title">Browse notes</span>
+        <div class="menu-toolbar">
+            <h2 id="nav-title">Browse notes</h2>
         </div>
         <div class="search-toolbar">
             <label for="search"><input type="text" name="search" placeholder="Search notes"></label>
@@ -50,7 +50,7 @@
 
         <ul class="notes-list" id="notes-list"></ul>
 
-        <div class="statistics-container hide" id="statistics-container"></div>
+        <div class="statistics-container hide"></div>
 
         <div class="settings-container hide" id="settings-container">
             <input type="checkbox" id="theme" name="theme"><label class="app-mode" for="theme">Dark mode</label>
@@ -60,9 +60,7 @@
 
     <div class="note-toolbar" id="note-toolbar"></div>
     <article class="note-content" id="note-content">
-        <section class="note-body" id="note-body">
-            <p>placeholder text...</p>
-        </section>
+        <section class="note-body" id="note-body"></section>
     </article>
 
     <script src="lib/tinymce/tinymce.min.js"></script>
