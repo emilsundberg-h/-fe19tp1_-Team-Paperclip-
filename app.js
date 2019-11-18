@@ -282,11 +282,10 @@ const renderNotesList = () => {
 
     notesArray.forEach(note => {
 
-        // get note body object
+        // get note body
         let noteBody = parseNoteBodyHTML(note.body);
 
         // get title
-
         let noteTitle = getNoteTitle(noteBody);
 
         // get preview
@@ -302,13 +301,13 @@ const renderNotesList = () => {
         // print HTML
         notesList.innerHTML +=
             `<li class="note-list-item ${currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
-            <div class="note-list-meta-container">
-                <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
-                <i class="${note.starred ? "fas" : "far"} fa-star"></i>
-            </div>
-            <h2 class="note-list-title">${noteTitle}</h2>
-            <span class="note-list-preview">${notePreview}</span>
-        </li>`;
+                <div class="note-list-meta-container">
+                    <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
+                    <i class="${note.starred ? "fas" : "far"} fa-star"></i>
+                </div>
+                <h2 class="note-list-title">${noteTitle}</h2>
+                <span class="note-list-preview">${notePreview}</span>
+            </li>`;
     });
 }
 
@@ -340,15 +339,15 @@ const updateNoteInNotesList = noteId => {
     }
 
     // get note body object
-    let noteBodyObject = parseNoteBodyHTML(note.body);
+    let noteBody = parseNoteBodyHTML(note.body);
 
     // update title
-    let noteTitle = getNoteTitle(noteBodyObject);
+    let noteTitle = getNoteTitle(noteBody);
 
     noteListItem.querySelector('.note-list-title').innerHTML = noteTitle;
 
     // update preview
-    let notePreview = getNotePreview(noteBodyObject);
+    let notePreview = getNotePreview(noteBody);
 
     noteListItem.querySelector('.note-list-preview').innerHTML = notePreview;
 
@@ -391,8 +390,6 @@ notesList.addEventListener('click', (e) => {
     // look up id of clicked note
     let noteId = Number(e.target.closest("li").dataset.id);
 
-    console.log('the id:', noteId)
-
     // toggle starred status if star is pressed
     if (e.target.classList.contains("fa-star")) {
 
@@ -412,56 +409,122 @@ notesList.addEventListener('click', (e) => {
         renderNote(noteId);
 
         updateNoteInNotesList(noteId);
+
+        // hide menu on mobile
+        document.querySelector('.menu').classList.remove('show');
     }
 });
 
 // navbar
-const navbarIcons = document.querySelector('#navbar-icons');
+const navbarMenu = document.querySelector('#navbar-menu');
 
-navbarIcons.addEventListener('click', (e) => {
+let currentMenu;
 
-    let pressedElement = e.target.id;
+navbarMenu.addEventListener('click', (e) => {
 
-    if (pressedElement === 'new-note') {
-        document.querySelector("#nav-title").innerText = "Browse notes"
-        document.querySelector(".search-toolbar").style.display = "flex"
+    let pressedMenu = e.target.id;
+    
+    switch (pressedMenu) {
 
+        case 'new-note': {
 
-        // then we create the new note (which returns its id)
-        let newNoteId = createNote('<h1>set a title?</h1>\n<p>Start typing... 🖋️</p>');
+            // then we create the new note (which returns its id)
+            let newNoteId = createNote('<h1>title...</h1>');
 
-        // followed by rendering the new note
-        renderNote(newNoteId);
+            // followed by rendering the new note
+            renderNote(newNoteId);
 
-        // we then select the generated h1
-        tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
+            // we then select the generated h1
+            tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
 
-        // re-render the notes list
-        renderNotesList();
+            // render notes lists
+            renderNotesList();
+
+            // hide menu on mobile
+            document.querySelector('.menu').classList.remove('show');
+
+            // 
+            document.querySelector("#nav-title").innerText = "Browse notes";
+            document.querySelector(".search-toolbar").style.display = "flex";
+
+            break
+        }
+
+        case 'browse-notes': {
+    
+            // toggle menu in mobile
+            if (currentMenu === 'browse-notes') {
+                document.querySelector('.menu').classList.toggle('show');
+            } else {
+                document.querySelector('.menu').classList.add('show');
+            }
+    
+            // show notes lists
+            document.querySelector('.notes-list').classList.remove('hide');
+    
+            // hide other submenus
+            document.querySelector('.settings-container').classList.add('hide');
+            document.querySelector('.statistics-container').classList.add('hide');
+
+            //
+            document.querySelector("#nav-title").innerText = "Browse notes";
+            document.querySelector(".search-toolbar").style.display = "flex";
+
+            // render notes list
+            renderNotesList();
+
+            break
+        }
+    
+        case 'statistics': {
+    
+            // toggle menu in mobile
+            if (currentMenu === 'statistics') {
+                document.querySelector('.menu').classList.toggle('show');
+            } else {
+                document.querySelector('.menu').classList.add('show');
+            }
+    
+            // show statistics
+            document.querySelector('.statistics-container').classList.remove('hide');
+    
+            // hide other submenus
+            document.querySelector('.settings-container').classList.add('hide');
+            document.querySelector('.notes-list').classList.add('hide');
+
+            //
+            document.querySelector("#nav-title").innerText = "Statistics";
+            document.querySelector(".search-toolbar").style.display = "none";
+
+            break
+        }
+    
+        case 'settings': {
+    
+            // toggle menu in mobile
+            if (currentMenu === 'settings') {
+                document.querySelector('.menu').classList.toggle('show');
+            } else {
+                document.querySelector('.menu').classList.add('show');
+            }
+    
+            // show settings
+            document.querySelector('.settings-container').classList.remove('hide');
+    
+            // hide other submenus
+            document.querySelector('.statistics-container').classList.add('hide');
+            document.querySelector('.notes-list').classList.add('hide');
+
+            //
+            document.querySelector("#nav-title").innerText = "Settings";
+            document.querySelector(".search-toolbar").style.display = "none";
+
+            break
+        }
     }
 
-    if (pressedElement === 'browse-notes') {
-        document.querySelector("#nav-title").innerText = "Browse notes"
-        document.querySelector(".search-toolbar").style.display = "flex"
-
-
-        renderNotesList();
-    }
-
-    if (pressedElement === 'statistics') {
-        document.querySelector("#nav-title").innerText = "Statistics"
-        document.querySelector(".search-toolbar").style.display = "none"
-
-        // do statistics things
-    }
-
-    if (pressedElement === 'settings') {
-        document.querySelector("#nav-title").innerText = "Settings"
-        document.querySelector(".search-toolbar").style.display = "none"
-
-
-        // do settings things
-    }
+    // update current menu
+    currentMenu = pressedMenu;
 });
 
 // load note content on page load
