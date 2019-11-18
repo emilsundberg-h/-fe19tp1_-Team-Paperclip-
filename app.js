@@ -16,10 +16,18 @@ tinymce.init({
     setup: (editor) => {
         editor.ui.registry.addButton('Template', {
             icon: 'template.svg',
-            tooltip: 'template Note',
+            tooltip: 'Choose Template',
             id: 'template-buttton',
             stateSelector: 'test-clas',
-            onAction: () => alert('Button clicked!')
+            onAction: () => {
+                document.querySelector('.bg-modal').style.display = 'flex';
+
+                document.querySelector('.close').addEventListener('click',function(){
+                document.querySelector('.bg-modal').style.display = 'none';
+            });
+                
+                
+            }
         });
     },
     //file picker image
@@ -488,3 +496,74 @@ let trans = () => {
         document.documentElement.classList.remove('transition')
     }, 1000)
 }
+const templateContent = document.querySelector('.templateContent');
+
+
+templateContent.addEventListener('click', (e) => {
+
+    let pressedElement = e.target.id;
+
+    if (pressedElement === 'temp1') {
+
+        // then we create the new note (which returns its id)
+        let newNoteId = createNote('<h1>Lever</h1>\n<p>Start typing... 🖋️</p>');
+
+        // followed by rendering the new note
+        renderNote(newNoteId);
+
+        // we then select the generated h1
+        tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
+
+        // re-render the notes list
+        renderNotesList();
+        document.querySelector('.bg-modal').style.display = 'none';
+    }
+
+    else if (pressedElement === 'temp2') {
+
+        // then we create the new note (which returns its id)
+        let newNoteId = createNote('<h1>feel alive @<img src="https://internetifokus.se/wp-content/uploads/2015/06/KYH-logo.png" alt="Bildresultat för kyh logo" style="background-color: var(--primary-background-color); color: var(--primary-text-color); font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;;"></h1><p><span id="_mce_caret" data-mce-bogus="1" data-mce-type="format-caret"><em>bra mall!﻿</em></span></p>');
+        // followed by rendering the new note
+        renderNote(newNoteId);
+
+        // we then select the generated h1
+        tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
+
+        // re-render the notes list
+        renderNotesList();
+        document.querySelector('.bg-modal').style.display = 'none';
+    }
+
+    else if (pressedElement === 'temp3') {
+
+        // then we create the new note (which returns its id)
+        let newNoteId = createNote('<h1>Im alive!</h1>\n<p>Start typing... 🖋️</p>');
+
+        // followed by rendering the new note
+        renderNote(newNoteId);
+
+        // we then select the generated h1
+        tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
+
+        // re-render the notes list
+        renderNotesList();
+        document.querySelector('.bg-modal').style.display = 'none';
+    }
+
+    else if (pressedElement === 'temp4') {
+
+        // then we create the new note (which returns its id)
+        let newNoteId = createNote('<h1>Sweet</h1>\n<p>Start typing... 🖋️</p>');
+
+        // followed by rendering the new note
+        renderNote(newNoteId);
+
+        // we then select the generated h1
+        tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
+
+        // re-render the notes list
+        renderNotesList();
+        document.querySelector('.bg-modal').style.display = 'none';
+    }
+})
+
