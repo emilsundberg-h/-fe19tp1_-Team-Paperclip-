@@ -382,8 +382,6 @@ notesList.addEventListener('click', (e) => {
     // look up id of clicked note
     let noteId = Number(e.target.closest("li").dataset.id);
 
-    console.log('the id:', noteId)
-
     // toggle starred status if star is pressed
     if (e.target.classList.contains("fa-star")) {
 
