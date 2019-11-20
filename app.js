@@ -22,11 +22,11 @@ tinymce.init({
             onAction: () => {
                 document.querySelector('.bg-modal').style.display = 'flex';
 
-                document.querySelector('.close').addEventListener('click',function(){
-                document.querySelector('.bg-modal').style.display = 'none';
-            });
-                
-                
+                document.querySelector('.close').addEventListener('click', function () {
+                    document.querySelector('.bg-modal').style.display = 'none';
+                });
+
+
             }
         });
     },
@@ -355,10 +355,17 @@ const updateNoteInNotesList = noteId => {
     let currentNote = getCurrentNote();
 
     if (currentNote === note.id) {
+        let checkClass = document.querySelectorAll(".note-list-item")
 
-        let currentNoteItem = document.querySelector('.note-list-item-current');
-        currentNoteItem.classList.remove('note-list-item-current');
+        //Check if selected note is visible
+        checkClass.forEach(function (e) {
 
+            if (e.classList.contains("note-list-item-current")) {
+
+                let currentNoteItem = document.querySelector('.note-list-item-current');
+                currentNoteItem.classList.remove('note-list-item-current');
+            }
+        })
         noteListItem.classList.add('note-list-item-current');
     }
 }
@@ -382,6 +389,8 @@ noteBody.addEventListener('input', (e) => {
     updateNoteInNotesList(currentNote);
 });
 
+
+
 // notes list
 const notesList = document.querySelector('#notes-list');
 
@@ -402,9 +411,13 @@ notesList.addEventListener('click', (e) => {
 
         // we save and update the current note first to ensure no changes get lost.
         // This because the input event listener does not detect all changes (TODO)
-        saveNote();
-        let currentNoteId = getCurrentNote();
-        updateNoteInNotesList(currentNoteId);
+
+        //Check if selected note is visible
+        if (e.target.classList.contains("note-list-item-current")) {
+            let currentNoteId = getCurrentNote();
+            updateNoteInNotesList(currentNoteId);
+            saveNote();
+        }
 
         renderNote(noteId);
 
@@ -423,11 +436,11 @@ let currentMenu;
 navbarMenu.addEventListener('click', (e) => {
 
     let pressedMenu = e.target.id;
-    
+
     switch (pressedMenu) {
 
         case 'new-note': {
-
+            document.querySelector('#search').value = ""
             // then we create the new note (which returns its id)
             let newNoteId = createNote('<h1>title...</h1>');
 
@@ -451,17 +464,17 @@ navbarMenu.addEventListener('click', (e) => {
         }
 
         case 'browse-notes': {
-    
+            document.querySelector('#search').value = ""
             // toggle menu in mobile
             if (currentMenu === 'browse-notes') {
                 document.querySelector('.menu').classList.toggle('show');
             } else {
                 document.querySelector('.menu').classList.add('show');
             }
-    
+
             // show notes lists
             document.querySelector('.notes-list').classList.remove('hide');
-    
+
             // hide other submenus
             document.querySelector('.settings-container').classList.add('hide');
             document.querySelector('.statistics-container').classList.add('hide');
@@ -475,19 +488,19 @@ navbarMenu.addEventListener('click', (e) => {
 
             break
         }
-    
+
         case 'statistics': {
-    
+
             // toggle menu in mobile
             if (currentMenu === 'statistics') {
                 document.querySelector('.menu').classList.toggle('show');
             } else {
                 document.querySelector('.menu').classList.add('show');
             }
-    
+
             // show statistics
             document.querySelector('.statistics-container').classList.remove('hide');
-    
+
             // hide other submenus
             document.querySelector('.settings-container').classList.add('hide');
             document.querySelector('.notes-list').classList.add('hide');
@@ -498,19 +511,19 @@ navbarMenu.addEventListener('click', (e) => {
 
             break
         }
-    
+
         case 'settings': {
-    
+
             // toggle menu in mobile
             if (currentMenu === 'settings') {
                 document.querySelector('.menu').classList.toggle('show');
             } else {
                 document.querySelector('.menu').classList.add('show');
             }
-    
+
             // show settings
             document.querySelector('.settings-container').classList.remove('hide');
-    
+
             // hide other submenus
             document.querySelector('.statistics-container').classList.add('hide');
             document.querySelector('.notes-list').classList.add('hide');
@@ -630,3 +643,44 @@ templateContent.addEventListener('click', (e) => {
     }
 })
 
+const searchInput = document.querySelector('#search');
+
+searchInput.addEventListener('keyup', function (string) {
+    const notesArrray = getNotesArray()
+    notesArray.sort((noteA, noteB) => Number(noteB.lastUpdated) - Number(noteA.lastUpdated));
+
+    let notesList = document.querySelector(".notes-list");
+    let searchString = ""
+    searchString += string.target.value
+    console.log(`Search string: ${searchString}`)
+    notesList.innerHTML = ""
+
+    notesArray.forEach(function (note) {
+        let noteBody = parseNoteBodyHTML(note.body);
+        // get title
+        let noteTitle = getNoteTitle(noteBody);
+
+        // get preview
+        let notePreview = getNotePreview(noteBody);
+
+        // get date
+        let noteDate = getNoteDate(note.lastUpdated);
+        let noteDateISO = getNoteDateISO(note.lastUpdated);
+
+        // get current note
+        let currentNote = getCurrentNote();
+
+        if (noteBody.toLowerCase().includes(searchString.toLowerCase())) {
+            console.log(`Found note: ${note.id}`);
+            notesList.innerHTML +=
+                `<li class="note-list-item ${currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
+                <div class="note-list-meta-container">
+                    <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
+                    <i class="${note.starred ? "fas" : "far"} fa-star"></i>
+                </div>
+                <h2 class="note-list-title">${noteTitle}</h2>
+                <span class="note-list-preview">${notePreview}</span>
+            </li>`;
+        }
+    })
+})

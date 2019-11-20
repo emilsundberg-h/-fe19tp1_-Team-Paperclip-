@@ -55,7 +55,7 @@ body {
 .navbar-logo svg {
   display: block;
   margin: auto;
-  padding: 15px 0;
+  padding: 5px 0;
   fill: #fff;
 }
 
@@ -98,6 +98,10 @@ body {
 
 .hide {
   display: none !important;
+}
+
+h2{
+  font-size: 1.3em;
 }
 
 .menu-toolbar {
