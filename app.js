@@ -301,10 +301,15 @@ const renderNotesList = () => {
         // print HTML
         notesList.innerHTML +=
             `<li class="note-list-item ${currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
-                <div class="note-list-meta-container">
-                    <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
-                    <i class="${note.starred ? "fas" : "far"} fa-star"></i>
-                </div>
+            <div class="note-list-meta-container">
+            
+            <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
+        
+        <div class="note-list-icons">
+        <i class="far fa-trash-alt"></i>    
+        <i class="${note.starred ? "fas" : "far"} fa-star"></i>
+        </div>
+        </div>
                 <h2 class="note-list-title">${noteTitle}</h2>
                 <span class="note-list-preview">${notePreview}</span>
             </li>`;
@@ -675,8 +680,13 @@ searchInput.addEventListener('keyup', function (string) {
             notesList.innerHTML +=
                 `<li class="note-list-item ${currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
                 <div class="note-list-meta-container">
+            
                     <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
-                    <i class="${note.starred ? "fas" : "far"} fa-star"></i>
+                
+                <div class="note-list-icons">
+                <i class="far fa-trash-alt"></i>    
+                <i class="${note.starred ? "fas" : "far"} fa-star"></i>
+                </div>
                 </div>
                 <h2 class="note-list-title">${noteTitle}</h2>
                 <span class="note-list-preview">${notePreview}</span>
