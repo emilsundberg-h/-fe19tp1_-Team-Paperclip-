@@ -436,6 +436,8 @@ const updateNoteInNotesList = noteId => {
 // set theme
 window.addEventListener('DOMContentLoaded', e => {
 
+    quireIO.checkData();
+
     let quireData = quireIO.getData();
 
     document.documentElement.setAttribute('data-theme', quireData.settings.theme);
