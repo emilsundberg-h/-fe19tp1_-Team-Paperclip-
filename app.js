@@ -66,125 +66,182 @@ tinymce.init({
 // local storage I/O
 // ############
 
-// check for notes array and create it if not found
-const checkForNotesArray = () => {
+const quireIO = (function() {
 
-    if (localStorage.getItem('notes')) {
-        console.log('yay! found notes array');
-    } else {
-        let notesArray = [];
-        localStorage.setItem('notes', JSON.stringify(notesArray));
-        localStorage.getItem('notes') ? console.log('notes array created') : console.log('oh no.. something went wrong creating notes array...');
-    }
-}
+    return {
+  
+        // check for quire object or create it if not found
+        checkData: function() {
+            if (localStorage.getItem('quireData')) {
+            console.log('yay! found quire object');
+            } else {
+            let quireData = {
+                notes: [],
+                currentNote: null,
+                templates: [],
+                tags: [],
+                settings: { theme: 'light' }
+            };
 
-// init notes array check on page load
-checkForNotesArray();
+            localStorage.setItem('quireData', JSON.stringify(quireData));
+            localStorage.getItem('quireData')
+                ? console.log('hiya! quire object created')
+                : console.log('oh no.. something went wrong creating quire object');
+            }
+        },
 
-// get notes array
-const getNotesArray = () => JSON.parse(localStorage.getItem('notes'));
+        // get quire object
+        getData: function() {
+            return JSON.parse(localStorage.getItem('quireData'));
+        },
 
-// write to notes array
-const writeToNotesArray = (notesArray) => localStorage.setItem('notes', JSON.stringify(notesArray));
+        // write to quire object
+        updateData: function(quireData) {
+            localStorage.setItem('quireData', JSON.stringify(quireData));
+        },
 
-// set currently viewed note ID
-const setCurrentNote = noteId => localStorage.setItem('currentNote', noteId);
+        // create note
+        createNote: function(body = '', starred = false, tags = []) {
+            let quireData = this.getData();
 
-// get currently viewed note ID
-const getCurrentNote = () => Number(localStorage.getItem('currentNote'));
+            let note = {
+                id: Date.now(), // this doubles as the created date
+                lastUpdated: Date.now(), // same as created initially, used to sort notes
+                body,
+                starred,
+                deleted: false, // TODO: currently not used
+                tags
+            };
 
-// create note
-const createNote = (body = '', starred = false) => {
+            quireData.notes.push(note);
 
-    let notesArray = getNotesArray();
+            this.updateData(quireData);
 
-    let note = {
-        id: Date.now(), // this doubles as the created date
-        lastUpdated: Date.now(), // same as created initially, used to sort notes 
-        body,
-        starred,
-    }
+            return note.id;
+        },
 
-    notesArray.push(note);
+        // get array index of a note
+        getNoteIndex: function(noteId) {
+            let quireData = this.getData();
 
-    writeToNotesArray(notesArray);
+            let noteIndex = quireData.notes.findIndex(note => note.id === noteId);
 
-    return note.id;
-}
+            if (noteIndex === -1) {
+                console.log('note NOT found...');
+                return false;
+            } else {
+                return noteIndex;
+            }
+        },
 
-// get array index of a note
-const getNoteIndex = noteId => {
+        // read note
+        readNote: function(noteId) {
+            let quireData = this.getData();
 
-    notesArray = getNotesArray(); // not using "let" somehow makes this a global variable
+            let noteIndex = this.getNoteIndex(noteId);
 
-    let noteIndex = notesArray.findIndex(note => note.id === noteId);
+            if (noteIndex === false) {
+            } else {
+                return quireData.notes[noteIndex];
+            }
+        },
 
-    if (noteIndex === -1) {
-        console.log('note NOT found...');
-        return false;
-    } else {
-        return noteIndex;
-    }
-}
+        // update note body
+        updateNoteBody: function(noteId, body) {
+            let quireData = this.getData();
 
-// read note 
-const readNote = noteId => {
+            let noteIndex = this.getNoteIndex(noteId);
 
-    let noteIndex = getNoteIndex(noteId);
+            if (noteIndex === false) {
+            } else {
+                let note = quireData.notes[noteIndex];
 
-    if (noteIndex === false) {
+                note.body = body;
+                note.lastUpdated = Date.now();
 
-    } else {
-        return notesArray[noteIndex];
-    }
-}
+                this.updateData(quireData);
+            }
+        },
 
-// update note body
-const updateNoteBody = (noteId, body) => {
+        // toggle starred status
+        toggleStarredStatus: function(noteId) {
+            let quireData = this.getData();
 
-    let noteIndex = getNoteIndex(noteId);
+            let noteIndex = this.getNoteIndex(noteId);
 
-    if (noteIndex === false) {
+            if (noteIndex === false) {
+            } else {
+                let note = quireData.notes[noteIndex];
 
-    } else {
-        let note = notesArray[noteIndex];
+                note.starred = !note.starred;
+                note.lastUpdated = Date.now();
 
-        note.body = body;
-        note.lastUpdated = Date.now();
+                this.updateData(quireData);
+            }
+        },
 
-        writeToNotesArray(notesArray);
-    }
-}
+        // delete note
+        deleteNote: function(noteId) {
+            let quireData = this.getData();
 
-// toggle starred status
-const toggleStarredStatus = noteId => {
+            let noteIndex = this.getNoteIndex(noteId);
 
-    let noteIndex = getNoteIndex(noteId);
+            if (noteIndex === false) {
+            } else {
+                quireData.notes.splice(noteIndex, 1);
+                // quireData.notes[noteIndex].deleted = true; // TODO: currently note used
+                this.updateData(quireData);
+            }
+        },
 
-    if (noteIndex === false) {
+        // add tag
+        addTag: function(tagName, noteId = 0) {
+            let quireData = this.getData();
 
-    } else {
-        let note = notesArray[noteIndex];
+            let tag;
 
-        note.starred = !note.starred;
-        note.lastUpdated = Date.now();
+            // if the tag does not exist, then we create it
+            if (!quireData.tags.some(tag => tag.name === tagName)) {
 
-        writeToNotesArray(notesArray);
-    }
-}
+                // corresponds to CSS classes
+                let tagColors = ['tag-blue', 'tag-red', 'tag-green', 'tag-orange'];
 
-// delete note
-const deleteNote = (noteId) => {
+                // create tag object
+                tag = {
+                    id: Date.now(),
+                    name: tagName,
+                    color: tagColors[Math.floor(Math.random() * tagColors.length)]
+                };
 
-    let noteIndex = getNoteIndex(noteId);
+                // add the tag to the global store
+                quireData.tags.push(tag);
 
-    if (noteIndex === false) {
+            } else {
+                // if the tag already exists then we assign the object to "tag"
+                tag = quireData.tags.filter(tag => tag.name === tagName)[0];
+            }
 
-    } else {
-        notesArray.splice(noteIndex, 1);
-        writeToNotesArray(notesArray);
-    }
-}
+            // if noteId is provided then we add the tag to the paticular note
+            if (noteId) {
+
+                let noteIndex = this.getNoteIndex(noteId);
+
+                if (noteIndex) {
+                    quireData.notes[noteIndex].tags.push(tag);
+                }
+            }
+
+            this.updateData(quireData);
+        },
+
+        // remove tag
+        removeTag: function() {
+
+            // TODO: create method
+            console.log('I do nothing at the moment :/');
+        }
+    };
+  })();
 
 // ############
 // Helper functions
@@ -245,32 +302,34 @@ const getNotePreview = noteBody => {
 // save note
 const saveNote = () => {
 
-    let noteId = getCurrentNote();
+    let noteId = quireIO.getData().currentNote;
 
     if (noteId) {
         let noteBody = tinyMCE.activeEditor.getContent();
 
-        updateNoteBody(noteId, noteBody);
+        quireIO.updateNoteBody(noteId, noteBody);
     }
 }
 
 // render note
 const renderNote = noteId => {
 
-    let note = readNote(noteId);
+    let note = quireIO.readNote(noteId);
 
     if (note) {
         tinyMCE.activeEditor.setContent(note.body);
 
         // update ID in local storage for currently viewed noted
-        setCurrentNote(note.id);
+        let quireData = quireIO.getData();
+        quireData.currentNote = note.id;
+        quireIO.updateData(quireData);
     }
 }
 
 // render notes list
 const renderNotesList = () => {
 
-    let notesArray = getNotesArray();
+    let quireData = quireIO.getData();
 
     let notesList = document.querySelector(".notes-list");
 
@@ -278,9 +337,9 @@ const renderNotesList = () => {
     notesList.innerHTML = "";
 
     // sort the array based on last updated date
-    notesArray.sort((noteA, noteB) => Number(noteB.lastUpdated) - Number(noteA.lastUpdated));
+    quireData.notes.sort((noteA, noteB) => Number(noteB.lastUpdated) - Number(noteA.lastUpdated));
 
-    notesArray.forEach(note => {
+    quireData.notes.forEach(note => {
 
         // get note body
         let noteBody = parseNoteBodyHTML(note.body);
@@ -295,22 +354,17 @@ const renderNotesList = () => {
         let noteDate = getNoteDate(note.lastUpdated);
         let noteDateISO = getNoteDateISO(note.lastUpdated);
 
-        // get current note
-        let currentNote = getCurrentNote();
-
         // print HTML
         notesList.innerHTML +=
-            `<li class="note-list-item ${currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
-            <div class="note-list-meta-container">
-            
-            <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
-        
-        <div class="note-list-icons">
-        <i class="far fa-trash-alt"></i>    
-        <i class="${note.starred ? "fas" : "far"} fa-star"></i>
-        </div>
-        </div>
-                <h2 class="note-list-title">${noteTitle}</h2>
+            `<li class="note-list-item ${quireData.currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
+                <div class="note-list-meta-container">
+                    <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
+                    <div class="note-list-icons">
+                        <i class="far fa-trash-alt"></i>    
+                        <i class="${note.starred ? "fas" : "far"} fa-star"></i>
+                    </div>
+                </div>
+                <h3 class="note-list-title">${noteTitle}</h3>
                 <span class="note-list-preview">${notePreview}</span>
             </li>`;
     });
@@ -320,7 +374,7 @@ const renderNotesList = () => {
 const updateNoteInNotesList = noteId => {
 
     // get note from local storage
-    let note = readNote(noteId);
+    let note = quireIO.readNote(noteId);
 
     // find list item with matching id in DOM
     const noteListItem = document.querySelector(`.notes-list > li[data-id="${note.id}"]`);
@@ -357,7 +411,7 @@ const updateNoteInNotesList = noteId => {
     noteListItem.querySelector('.note-list-preview').innerHTML = notePreview;
 
     // update current note status
-    let currentNote = getCurrentNote();
+    let currentNote = quireIO.getData().currentNote;
 
     if (currentNote === note.id) {
         let checkClass = document.querySelectorAll(".note-list-item")
@@ -379,22 +433,35 @@ const updateNoteInNotesList = noteId => {
 // Event listeners
 // ############
 
+// set theme
+window.addEventListener('DOMContentLoaded', e => {
+
+    let quireData = quireIO.getData();
+
+    document.documentElement.setAttribute('data-theme', quireData.settings.theme);
+})
+
+// page load
+window.addEventListener('load', e => {
+
+    let quireData = quireIO.getData();
+
+    renderNote(quireData.currentNote);
+
+    renderNotesList();
+});
+
 // note body
 const noteBody = document.querySelector('#note-body');
 
-// TODO: listening for input is not the perfect solution to detect change
-// when e.g. deleting note content (crtl + a and delete/backspace)
-// look into tinymce API, other event listener or maybe mutationobserver
-noteBody.addEventListener('input', (e) => {
+noteBody.addEventListener('keyup', e => {
 
     saveNote();
 
-    let currentNote = getCurrentNote();
+    let currentNote = quireIO.getData().currentNote;
 
     updateNoteInNotesList(currentNote);
 });
-
-
 
 // notes list
 const notesList = document.querySelector('#notes-list');
@@ -407,15 +474,32 @@ notesList.addEventListener('click', (e) => {
     // toggle starred status if star is pressed
     if (e.target.classList.contains("fa-star")) {
 
-        toggleStarredStatus(noteId);
+        quireIO.toggleStarredStatus(noteId);
 
         updateNoteInNotesList(noteId);
 
         // else just render the note
-    } else {
+    } else if (e.target.classList.contains("fa-trash-alt")) {
 
-        // we save and update the current note first to ensure no changes get lost.
-        // This because the input event listener does not detect all changes (TODO)
+        let quireData = quireIO.getData();
+
+        // TODO: add user validation prior to deleting
+        
+        // in case user deletes the current note
+        if (noteId == quireData.currentNote) {
+
+            // update currentNote
+            quireData.currentNote = 0;
+            quireIO.updateData(quireData)
+
+            // clear the editor
+            tinyMCE.activeEditor.setContent('');
+        }
+
+        quireIO.deleteNote(noteId);
+
+        renderNotesList();
+    } else {
 
         //Check if selected note is visible
         if (e.target.classList.contains("note-list-item-current")) {
@@ -447,7 +531,7 @@ navbarMenu.addEventListener('click', (e) => {
         case 'new-note': {
             document.querySelector('#search').value = ""
             // then we create the new note (which returns its id)
-            let newNoteId = createNote('<h1>title...</h1>');
+            let newNoteId = quireIO.createNote('<h1>title...</h1>');
 
             // followed by rendering the new note
             renderNote(newNoteId);
@@ -460,6 +544,13 @@ navbarMenu.addEventListener('click', (e) => {
 
             // hide menu on mobile
             document.querySelector('.menu').classList.remove('show');
+
+            // show notes lists
+            document.querySelector('.notes-list').classList.remove('hide');
+
+            // hide other submenus
+            document.querySelector('.settings-container').classList.add('hide');
+            document.querySelector('.statistics-container').classList.add('hide');
 
             // 
             document.querySelector("#nav-title").innerText = "Browse notes";
@@ -545,30 +636,24 @@ navbarMenu.addEventListener('click', (e) => {
     currentMenu = pressedMenu;
 });
 
-// load note content on page load
-window.addEventListener('load', (e) => {
+// dark mode
+const themeCheckbox = document.querySelector('input[name=theme]');
 
-    let noteId = getCurrentNote();
+themeCheckbox.addEventListener('change', function(e) {
 
-    renderNote(noteId);
+    let quireData = quireIO.getData();
 
-    renderNotesList();
-});
-
-// ############
-// 
-// ############
-
-var checkbox = document.querySelector('input[name=theme]');
-
-checkbox.addEventListener('change', function () {
     if (this.checked) {
-        trans()
-        document.documentElement.setAttribute('data-theme', 'dark')
+      trans();
+      document.documentElement.setAttribute('data-theme', 'dark');
+      quireData.settings.theme = 'dark';
     } else {
-        trans()
-        document.documentElement.setAttribute('data-theme', 'light')
+      trans();
+      document.documentElement.setAttribute('data-theme', 'light');
+      quireData.settings.theme = 'light';
     }
+  
+    quireIO.updateData(quireData);
 })
 
 let trans = () => {
@@ -577,8 +662,9 @@ let trans = () => {
         document.documentElement.classList.remove('transition')
     }, 1000)
 }
-const templateContent = document.querySelector('.templateContent');
 
+// template
+const templateContent = document.querySelector('.templateContent');
 
 templateContent.addEventListener('click', (e) => {
 
@@ -587,7 +673,7 @@ templateContent.addEventListener('click', (e) => {
     if (pressedElement === 'temp1') {
 
         // then we create the new note (which returns its id)
-        let newNoteId = createNote('<h1>Lever</h1>\n<p>Start typing... 🖋️</p>');
+        let newNoteId = quireIO.createNote('<h1>Lever</h1>\n<p>Start typing... 🖋️</p>');
 
         // followed by rendering the new note
         renderNote(newNoteId);
@@ -603,7 +689,7 @@ templateContent.addEventListener('click', (e) => {
     else if (pressedElement === 'temp2') {
 
         // then we create the new note (which returns its id)
-        let newNoteId = createNote('<h1>feel alive @<img src="https://internetifokus.se/wp-content/uploads/2015/06/KYH-logo.png" alt="Bildresultat för kyh logo" style="background-color: var(--primary-background-color); color: var(--primary-text-color); font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;;"></h1><p><span id="_mce_caret" data-mce-bogus="1" data-mce-type="format-caret"><em>bra mall!﻿</em></span></p>');
+        let newNoteId = quireIO.createNote('<h1>feel alive @<img src="https://internetifokus.se/wp-content/uploads/2015/06/KYH-logo.png" alt="Bildresultat för kyh logo" style="background-color: var(--primary-background-color); color: var(--primary-text-color); font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;;"></h1><p><span id="_mce_caret" data-mce-bogus="1" data-mce-type="format-caret"><em>bra mall!﻿</em></span></p>');
         // followed by rendering the new note
         renderNote(newNoteId);
 
@@ -618,7 +704,7 @@ templateContent.addEventListener('click', (e) => {
     else if (pressedElement === 'temp3') {
 
         // then we create the new note (which returns its id)
-        let newNoteId = createNote('<h1>Im alive!</h1>\n<p>Start typing... 🖋️</p>');
+        let newNoteId = quireIO.createNote('<h1>Im alive!</h1>\n<p>Start typing... 🖋️</p>');
 
         // followed by rendering the new note
         renderNote(newNoteId);
@@ -634,7 +720,7 @@ templateContent.addEventListener('click', (e) => {
     else if (pressedElement === 'temp4') {
 
         // then we create the new note (which returns its id)
-        let newNoteId = createNote('<h1>Sweet</h1>\n<p>Start typing... 🖋️</p>');
+        let newNoteId = quireIO.createNote('<h1>Sweet</h1>\n<p>Start typing... 🖋️</p>');
 
         // followed by rendering the new note
         renderNote(newNoteId);
@@ -650,18 +736,22 @@ templateContent.addEventListener('click', (e) => {
 
 const searchInput = document.querySelector('#search');
 
-searchInput.addEventListener('keyup', function (string) {
-    const notesArrray = getNotesArray()
-    notesArray.sort((noteA, noteB) => Number(noteB.lastUpdated) - Number(noteA.lastUpdated));
+searchInput.addEventListener('keyup', string => {
+
+    let quireData = quireIO.getData();
+
+    quireData.notes.sort((noteA, noteB) => Number(noteB.lastUpdated) - Number(noteA.lastUpdated));
 
     let notesList = document.querySelector(".notes-list");
-    let searchString = ""
-    searchString += string.target.value
-    console.log(`Search string: ${searchString}`)
-    notesList.innerHTML = ""
+    notesList.innerHTML = "";
 
-    notesArray.forEach(function (note) {
+    let searchString = "";
+    searchString += string.target.value;
+
+    quireData.notes.forEach(note => {
+
         let noteBody = parseNoteBodyHTML(note.body);
+
         // get title
         let noteTitle = getNoteTitle(noteBody);
 
@@ -672,25 +762,19 @@ searchInput.addEventListener('keyup', function (string) {
         let noteDate = getNoteDate(note.lastUpdated);
         let noteDateISO = getNoteDateISO(note.lastUpdated);
 
-        // get current note
-        let currentNote = getCurrentNote();
-
         if (noteBody.toLowerCase().includes(searchString.toLowerCase())) {
-            console.log(`Found note: ${note.id}`);
             notesList.innerHTML +=
-                `<li class="note-list-item ${currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
-                <div class="note-list-meta-container">
-            
-                    <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
-                
-                <div class="note-list-icons">
-                <i class="far fa-trash-alt"></i>    
-                <i class="${note.starred ? "fas" : "far"} fa-star"></i>
-                </div>
-                </div>
-                <h2 class="note-list-title">${noteTitle}</h2>
-                <span class="note-list-preview">${notePreview}</span>
-            </li>`;
+                `<li class="note-list-item ${quireData.currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
+                    <div class="note-list-meta-container">
+                        <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
+                        <div class="note-list-icons">
+                            <i class="far fa-trash-alt"></i>    
+                            <i class="${note.starred ? "fas" : "far"} fa-star"></i>
+                        </div>
+                    </div>
+                    <h3 class="note-list-title">${noteTitle}</h3>
+                    <span class="note-list-preview">${notePreview}</span>
+                </li>`;
         }
     })
-})
+});
