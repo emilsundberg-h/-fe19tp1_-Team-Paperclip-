@@ -366,11 +366,12 @@ const renderNotesList = () => {
                 <div class="note-list-meta-container">
                     <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
                     <div class="note-list-icons">
-                        <i class="far fa-trash-alt"></i>    
-                        <i class="${note.starred ? "fas" : "far"} fa-star"></i>
+                        <button class= "delete-button" title="Delete note"></button>
+                        <input type="checkbox" name="star-${note.id}" id="star-${note.id}" class="starred-checkbox" ${note.starred ? "checked" : ""}>
+                        <label for="star-${note.id}" title="${note.starred ? 'Unstar note' : 'Star note'}"></label>
                     </div>
                 </div>
-                <h3 class="note-list-title">${noteTitle}</h3>
+                <a href="#" class="note-list-link"><h3 class="note-list-title">${noteTitle}</h3></a>
                 <span class="note-list-preview">${notePreview}</span>
             </li>`;
     });
@@ -393,15 +394,8 @@ const updateNoteInNotesList = noteId => {
     noteListItem.querySelector('time').setAttribute('datetime', noteDateISO);
 
     // update starred status
-    let noteStar = noteListItem.querySelector('.fa-star');
-
-    if (note.starred) {
-        noteStar.classList.add('fas');
-        noteStar.classList.remove('far');
-    } else {
-        noteStar.classList.add('far');
-        noteStar.classList.remove('fas');
-    }
+    let noteStar = noteListItem.querySelector('.starred-checkbox');
+    note.starred ? noteStar.checked = true : noteStar.checked = false;
 
     // get note body object
     let noteBody = parseNoteBodyHTML(note.body);
@@ -480,14 +474,12 @@ notesList.addEventListener('click', (e) => {
     let noteId = Number(e.target.closest("li").dataset.id);
 
     // toggle starred status if star is pressed
-    if (e.target.classList.contains("fa-star")) {
+    if (e.target.classList.contains('starred-checkbox')) {
 
         quireIO.toggleStarredStatus(noteId);
 
-        updateNoteInNotesList(noteId);
-
-        // else just render the note
-    } else if (e.target.classList.contains("fa-trash-alt")) {
+    // delete note if trash can is pressed
+    } else if (e.target.classList.contains("delete-button")) {
 
         let quireData = quireIO.getData();
 
@@ -511,14 +503,10 @@ notesList.addEventListener('click', (e) => {
             if (searchStarred.checked) searchStar = true;
             searchNotesList(searchString, searchStar);
         }
-    } else {
 
-        //Check if selected note is visible
-        if (e.target.classList.contains("note-list-item-current")) {
-            let currentNoteId = getCurrentNote();
-            updateNoteInNotesList(currentNoteId);
-            saveNote();
-        }
+    // else just render the note
+    // pressing the star triggers the click event twice hence the label condition
+    } else if (e.target.tagName !== 'LABEL') {
 
         renderNote(noteId);
 
@@ -566,7 +554,6 @@ navbarMenu.addEventListener('click', (e) => {
 
             // change menu title
             document.querySelector("#menu-title").innerText = "Browse notes";
-            // document.querySelector(".search-toolbar").style.display = "flex";
 
             break
         }
@@ -614,7 +601,6 @@ navbarMenu.addEventListener('click', (e) => {
 
             // change menu title
             document.querySelector("#menu-title").innerText = "Statistics";
-
 
             break
         }
@@ -766,7 +752,7 @@ searchInput.addEventListener('keyup', function (string) {
     searchNotesList(searchString, searchStar);
 })
 
-searchStarred.addEventListener('click', function () {
+searchStarred.addEventListener('click', function (e) {
 
     let searchString = searchInput.value;
     let searchStar = searchStarred.checked;
@@ -801,18 +787,17 @@ const searchNotesList = (searchString = '', searchStar = false) => {
 
             notesList.innerHTML +=
                 `<li class="note-list-item ${quireData.currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
-                <div class="note-list-meta-container">
-            
-                    <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
-                
-                <div class="note-list-icons">
-                <i class="far fa-trash-alt"></i>    
-                <i class="${note.starred ? "fas" : "far"} fa-star"></i>
-                </div>
-                </div>
-                <h2 class="note-list-title">${noteTitle}</h2>
-                <span class="note-list-preview">${notePreview}</span>
-            </li>`;
+                    <div class="note-list-meta-container">
+                        <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
+                        <div class="note-list-icons">
+                            <button class= "delete-button" title="Delete note"></button>
+                            <input type="checkbox" name="star-${note.id}" id="star-${note.id}" class="starred-checkbox" ${note.starred ? "checked" : ""}>
+                            <label for="star-${note.id}" title="${note.starred ? 'Unstar note' : 'Star note'}"></label>
+                        </div>
+                    </div>
+                    <a href="#" class="note-list-link"><h3 class="note-list-title">${noteTitle}</h3></a>
+                    <span class="note-list-preview">${notePreview}</span>
+                </li>`;
         }
     })
     if (notesList.innerHTML == '') {
