@@ -531,7 +531,11 @@ navbarMenu.addEventListener('click', (e) => {
     switch (pressedMenu) {
 
         case 'new-note': {
+
+            //reset search function
+            if (searchStarred.classList.contains('fas')) searchStarred.classList.remove('fas')
             document.querySelector('#search').value = ""
+
             // then we create the new note (which returns its id)
             let newNoteId = quireIO.createNote('<h1>title...</h1>');
 
@@ -562,7 +566,11 @@ navbarMenu.addEventListener('click', (e) => {
         }
 
         case 'browse-notes': {
+
+            //reset search function
+            if (searchStarred.classList.contains('fas')) searchStarred.classList.remove('fas')
             document.querySelector('#search').value = ""
+
             // toggle menu in mobile
             if (currentMenu === 'browse-notes') {
                 document.querySelector('.menu').classList.toggle('show');
@@ -735,7 +743,6 @@ templateContent.addEventListener('click', (e) => {
         document.querySelector('.bg-modal').style.display = 'none';
     }
 })
-
 
 const searchInput = document.querySelector('#search');
 const searchStarred = document.querySelector('.search-toolbar > i');
