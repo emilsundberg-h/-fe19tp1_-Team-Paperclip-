@@ -66,42 +66,42 @@ tinymce.init({
 // local storage I/O
 // ############
 
-const quireIO = (function() {
+const quireIO = (function () {
 
     return {
-  
-        // check for quire object or create it if not found
-        checkData: function() {
-            if (localStorage.getItem('quireData')) {
-            console.log('yay! found quire object');
-            } else {
-            let quireData = {
-                notes: [],
-                currentNote: null,
-                templates: [],
-                tags: [],
-                settings: { theme: 'light' }
-            };
 
-            localStorage.setItem('quireData', JSON.stringify(quireData));
-            localStorage.getItem('quireData')
-                ? console.log('hiya! quire object created')
-                : console.log('oh no.. something went wrong creating quire object');
+        // check for quire object or create it if not found
+        checkData: function () {
+            if (localStorage.getItem('quireData')) {
+                console.log('yay! found quire object');
+            } else {
+                let quireData = {
+                    notes: [],
+                    currentNote: null,
+                    templates: [],
+                    tags: [],
+                    settings: { theme: 'light' }
+                };
+
+                localStorage.setItem('quireData', JSON.stringify(quireData));
+                localStorage.getItem('quireData')
+                    ? console.log('hiya! quire object created')
+                    : console.log('oh no.. something went wrong creating quire object');
             }
         },
 
         // get quire object
-        getData: function() {
+        getData: function () {
             return JSON.parse(localStorage.getItem('quireData'));
         },
 
         // write to quire object
-        updateData: function(quireData) {
+        updateData: function (quireData) {
             localStorage.setItem('quireData', JSON.stringify(quireData));
         },
 
         // create note
-        createNote: function(body = '', starred = false, tags = []) {
+        createNote: function (body = '', starred = false, tags = []) {
             let quireData = this.getData();
 
             let note = {
@@ -121,7 +121,7 @@ const quireIO = (function() {
         },
 
         // get array index of a note
-        getNoteIndex: function(noteId) {
+        getNoteIndex: function (noteId) {
             let quireData = this.getData();
 
             let noteIndex = quireData.notes.findIndex(note => note.id === noteId);
@@ -135,7 +135,7 @@ const quireIO = (function() {
         },
 
         // read note
-        readNote: function(noteId) {
+        readNote: function (noteId) {
             let quireData = this.getData();
 
             let noteIndex = this.getNoteIndex(noteId);
@@ -147,7 +147,7 @@ const quireIO = (function() {
         },
 
         // update note body
-        updateNoteBody: function(noteId, body) {
+        updateNoteBody: function (noteId, body) {
             let quireData = this.getData();
 
             let noteIndex = this.getNoteIndex(noteId);
@@ -164,7 +164,7 @@ const quireIO = (function() {
         },
 
         // toggle starred status
-        toggleStarredStatus: function(noteId) {
+        toggleStarredStatus: function (noteId) {
             let quireData = this.getData();
 
             let noteIndex = this.getNoteIndex(noteId);
@@ -181,7 +181,7 @@ const quireIO = (function() {
         },
 
         // delete note
-        deleteNote: function(noteId) {
+        deleteNote: function (noteId) {
             let quireData = this.getData();
 
             let noteIndex = this.getNoteIndex(noteId);
@@ -195,7 +195,7 @@ const quireIO = (function() {
         },
 
         // add tag
-        addTag: function(tagName, noteId = 0) {
+        addTag: function (tagName, noteId = 0) {
             let quireData = this.getData();
 
             let tag;
@@ -235,13 +235,13 @@ const quireIO = (function() {
         },
 
         // remove tag
-        removeTag: function() {
+        removeTag: function () {
 
             // TODO: create method
             console.log('I do nothing at the moment :/');
         }
     };
-  })();
+})();
 
 // ############
 // Helper functions
@@ -486,7 +486,7 @@ notesList.addEventListener('click', (e) => {
         let quireData = quireIO.getData();
 
         // TODO: add user validation prior to deleting
-        
+
         // in case user deletes the current note
         if (noteId == quireData.currentNote) {
 
@@ -641,20 +641,20 @@ navbarMenu.addEventListener('click', (e) => {
 // dark mode
 const themeCheckbox = document.querySelector('input[name=theme]');
 
-themeCheckbox.addEventListener('change', function(e) {
+themeCheckbox.addEventListener('change', function (e) {
 
     let quireData = quireIO.getData();
 
     if (this.checked) {
-      trans();
-      document.documentElement.setAttribute('data-theme', 'dark');
-      quireData.settings.theme = 'dark';
+        trans();
+        document.documentElement.setAttribute('data-theme', 'dark');
+        quireData.settings.theme = 'dark';
     } else {
-      trans();
-      document.documentElement.setAttribute('data-theme', 'light');
-      quireData.settings.theme = 'light';
+        trans();
+        document.documentElement.setAttribute('data-theme', 'light');
+        quireData.settings.theme = 'light';
     }
-  
+
     quireIO.updateData(quireData);
 })
 
@@ -736,22 +736,42 @@ templateContent.addEventListener('click', (e) => {
     }
 })
 
-const searchInput = document.querySelector('#search');
 
-searchInput.addEventListener('keyup', string => {
+const searchInput = document.querySelector('#search');
+const searchStarred = document.querySelector('.search-toolbar > i');
+
+searchInput.addEventListener('keyup', function (string) {
+
+    let searchString = ''
+    let searchStar
+
+    searchString += string.target.value
+    searchStarred.classList.contains('fas') ? searchStar = true : searchStar = false;
+
+    searchNotesList(searchString, searchStar)
+})
+
+searchStarred.addEventListener('click', function () {
+    searchStarred.classList.toggle('fas');
+
+    let searchString = searchInput.value
+    let searchStar
+
+    searchStarred.classList.contains('fas') ? searchStar = true : searchStar = false;
+
+    searchNotesList(searchString, searchStar)
+})
+
+const searchNotesList = (searchString = '', searchStar = false) => {
 
     let quireData = quireIO.getData();
 
     quireData.notes.sort((noteA, noteB) => Number(noteB.lastUpdated) - Number(noteA.lastUpdated));
 
-    let notesList = document.querySelector(".notes-list");
-    notesList.innerHTML = "";
-
-    let searchString = "";
-    searchString += string.target.value;
+    let notesList = document.querySelector('.notes-list');
+    notesList.innerHTML = '';
 
     quireData.notes.forEach(note => {
-
         let noteBody = parseNoteBodyHTML(note.body);
 
         // get title
@@ -764,19 +784,28 @@ searchInput.addEventListener('keyup', string => {
         let noteDate = getNoteDate(note.lastUpdated);
         let noteDateISO = getNoteDateISO(note.lastUpdated);
 
-        if (noteBody.toLowerCase().includes(searchString.toLowerCase())) {
+        if (noteBody.toLowerCase().includes(searchString.toLowerCase())
+            && (note.starred == true || note.starred == searchStar)) {
+
             notesList.innerHTML +=
                 `<li class="note-list-item ${quireData.currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
-                    <div class="note-list-meta-container">
-                        <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
-                        <div class="note-list-icons">
-                            <i class="far fa-trash-alt"></i>    
-                            <i class="${note.starred ? "fas" : "far"} fa-star"></i>
-                        </div>
-                    </div>
-                    <h3 class="note-list-title">${noteTitle}</h3>
-                    <span class="note-list-preview">${notePreview}</span>
-                </li>`;
+                <div class="note-list-meta-container">
+            
+                    <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
+                
+                <div class="note-list-icons">
+                <i class="far fa-trash-alt"></i>    
+                <i class="${note.starred ? "fas" : "far"} fa-star"></i>
+                </div>
+                </div>
+                <h2 class="note-list-title">${noteTitle}</h2>
+                <span class="note-list-preview">${notePreview}</span>
+            </li>`;
         }
     })
-});
+    if (notesList.innerHTML == '') {
+        notesList.innerHTML =
+            `<div class="no-search-result"><i>No ${(searchStar) ? "starred" : ""} notes 
+        ${(searchString) ? 'with ' + '"' + searchString + '"' : ""} found.</i ></div > `
+    }
+}

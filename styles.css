@@ -148,6 +148,11 @@ h2{
   outline: none;
 }
 
+.no-search-result{
+  padding: 8px;
+  font-size: 14px;
+}
+
 .notes-list {
   display: block;
   width: 100%;
@@ -182,7 +187,7 @@ h2{
 .note-list-meta-container {
   display: flex;
   justify-content: space-between;
-  align-content: center;
+  align-items: flex-end;
 
 }
 .note-list-icons {
@@ -193,6 +198,7 @@ padding-right: 3px;
 }
 .fa-star {
   padding-left: 3px;
+  cursor: pointer;
 }
 .note-list-date {
   font-size: 11px;
