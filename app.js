@@ -748,8 +748,9 @@ const searchInput = document.querySelector('#search');
 const searchStarred = document.querySelector('#starred-search');
 
 searchInput.addEventListener('search', function () {
-    if (searchStarred.checked) {
-        searchNotesList('', true);
+    if (searchStarred.checked || !searchInput.value == '') {
+        searchString = searchInput.value
+        searchNotesList(searchString, searchStarred.checked);
     } else {
         renderNotesList();
     }
