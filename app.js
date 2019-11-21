@@ -267,37 +267,34 @@ const parseNoteBodyHTML = noteBody => {
     // Retrieve the text property of the element (cross-browser support)
     return temporalDivElement.textContent || temporalDivElement.innerText || "";
 }
-// get note title
-const getNoteTitle = noteBody => {
-
-    let rows = noteBody.split('\n');
-
-    let noteTitle
-
-    rows.forEach(function (row) {
-        if (row.length >= 1 && !noteTitle) noteTitle = row
-    })
-
-    if (!noteTitle || noteTitle === ' ') noteTitle = 'No title...'
-
-
-    return noteTitle
-}
 
 // get note preview
 const getNotePreview = noteBody => {
 
     let rows = noteBody.split('\n');
+    let words = noteBody.split(' ');
 
-    let notePreview;
+    let notePreview = '';
+    let noteTitle = '';
+    let arrNotePreview = [];
 
     rows.forEach(function (row, i) {
-        if (row.length >= 1 && !notePreview && rows[i + 1] !== ' ') notePreview = rows[i + 1]
+        if (noteTitle.trim().length < 1) {
+            noteTitle = row;
+        } else if (notePreview.trim().length < 1)
+            notePreview = row;
     })
 
-    if (!notePreview || notePreview === ' ') notePreview = '<i>No preview...</i>'
+    if (notePreview.trim().length < 1 && words.length > 4) {
+        noteTitle = `${words[0]} ${words[1]} ${words[2]} ${words[3]}...`;
+        notePreview = `...${noteBody.substring(noteTitle.length - 2)}`;
+    }
 
-    return notePreview;
+    if (!noteTitle || noteTitle === ' ') noteTitle = 'No title...';
+    if (!notePreview || notePreview.length < 1) notePreview = '<i>No preview...</i>';
+
+    arrNotePreview.push(noteTitle, notePreview);
+    return arrNotePreview;
 }
 
 // ############
@@ -334,6 +331,10 @@ const renderNote = noteId => {
 // render notes list
 const renderNotesList = () => {
 
+    //reset search function
+    document.querySelector('#starred-search').checked = false;
+    document.querySelector('#search').value = "";
+
     let quireData = quireIO.getData();
 
     let notesList = document.querySelector(".note-list");
@@ -350,10 +351,10 @@ const renderNotesList = () => {
         let noteBody = parseNoteBodyHTML(note.body);
 
         // get title
-        let noteTitle = getNoteTitle(noteBody);
+        let noteTitle = getNotePreview(noteBody)[0];
 
         // get preview
-        let notePreview = getNotePreview(noteBody);
+        let notePreview = getNotePreview(noteBody)[1];
 
         // get date
         let noteDate = getNoteDate(note.lastUpdated);
@@ -406,12 +407,12 @@ const updateNoteInNotesList = noteId => {
     let noteBody = parseNoteBodyHTML(note.body);
 
     // update title
-    let noteTitle = getNoteTitle(noteBody);
+    let noteTitle = getNotePreview(noteBody)[0];
 
     noteListItem.querySelector('.note-list-title').innerHTML = noteTitle;
 
     // update preview
-    let notePreview = getNotePreview(noteBody);
+    let notePreview = getNotePreview(noteBody)[1];
 
     noteListItem.querySelector('.note-list-preview').innerHTML = notePreview;
 
@@ -501,7 +502,15 @@ notesList.addEventListener('click', (e) => {
 
         quireIO.deleteNote(noteId);
 
-        renderNotesList();
+        //Check if notelist is in search mode
+        if (document.querySelector('#search').value == "" && !searchStarred.checked) {
+            renderNotesList();
+        } else {
+            let searchStar = false;
+            let searchString = document.querySelector('#search').value;
+            if (searchStarred.checked) searchStar = true;
+            searchNotesList(searchString, searchStar);
+        }
     } else {
 
         //Check if selected note is visible
@@ -533,10 +542,6 @@ navbarMenu.addEventListener('click', (e) => {
 
         case 'new-note': {
 
-            //reset search function
-            document.querySelector('#starred-search').checked = false;
-            document.querySelector('#search').value = ""
-
             // then we create the new note (which returns its id)
             let newNoteId = quireIO.createNote('<h1>title...</h1>');
 
@@ -567,10 +572,6 @@ navbarMenu.addEventListener('click', (e) => {
         }
 
         case 'browse-notes': {
-
-            //reset search function
-            if (searchStarred.classList.contains('fas')) searchStarred.classList.remove('fas')
-            document.querySelector('#search').value = ""
 
             // toggle menu in mobile
             if (currentMenu === 'browse-notes') {
@@ -613,7 +614,7 @@ navbarMenu.addEventListener('click', (e) => {
 
             // change menu title
             document.querySelector("#menu-title").innerText = "Statistics";
-            
+
 
             break
         }
@@ -746,22 +747,30 @@ templateContent.addEventListener('click', (e) => {
 const searchInput = document.querySelector('#search');
 const searchStarred = document.querySelector('#starred-search');
 
+searchInput.addEventListener('search', function () {
+    if (searchStarred.checked) {
+        searchNotesList('', true);
+    } else {
+        renderNotesList();
+    }
+})
+
 searchInput.addEventListener('keyup', function (string) {
 
-    let searchString = ''
+    let searchString = '';
     let searchStar = searchStarred.checked;
 
-    searchString += string.target.value
+    searchString += string.target.value;
 
-    searchNotesList(searchString, searchStar)
+    searchNotesList(searchString, searchStar);
 })
 
 searchStarred.addEventListener('click', function () {
 
-    let searchString = searchInput.value
+    let searchString = searchInput.value;
     let searchStar = searchStarred.checked;
 
-    searchNotesList(searchString, searchStar)
+    searchNotesList(searchString, searchStar);
 })
 
 const searchNotesList = (searchString = '', searchStar = false) => {
@@ -777,10 +786,10 @@ const searchNotesList = (searchString = '', searchStar = false) => {
         let noteBody = parseNoteBodyHTML(note.body);
 
         // get title
-        let noteTitle = getNoteTitle(noteBody);
+        let noteTitle = getNotePreview(noteBody)[0];
 
         // get preview
-        let notePreview = getNotePreview(noteBody);
+        let notePreview = getNotePreview(noteBody)[1];
 
         // get date
         let noteDate = getNoteDate(note.lastUpdated);
@@ -808,6 +817,6 @@ const searchNotesList = (searchString = '', searchStar = false) => {
     if (notesList.innerHTML == '') {
         notesList.innerHTML =
             `<div class="no-search-result"><i>No ${(searchStar) ? "starred" : ""} notes 
-        ${(searchString) ? 'with ' + '"' + searchString + '"' : ""} found.</i ></div > `
+        ${(searchString) ? 'with ' + '"' + searchString + '"' : ""} found.</i ></div > `;
     }
 }
