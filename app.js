@@ -190,6 +190,11 @@ const quireIO = (function () {
             } else {
                 quireData.notes.splice(noteIndex, 1);
                 // quireData.notes[noteIndex].deleted = true; // TODO: currently note used
+
+                if (quireData.currentNote === noteId) {
+                    quireData.currentNote = 0;
+                }
+
                 this.updateData(quireData);
             }
         },
@@ -331,7 +336,7 @@ const renderNotesList = () => {
 
     let quireData = quireIO.getData();
 
-    let notesList = document.querySelector(".notes-list");
+    let notesList = document.querySelector(".note-list");
 
     // clear notes list
     notesList.innerHTML = "";
@@ -377,7 +382,7 @@ const updateNoteInNotesList = noteId => {
     let note = quireIO.readNote(noteId);
 
     // find list item with matching id in DOM
-    const noteListItem = document.querySelector(`.notes-list > li[data-id="${note.id}"]`);
+    const noteListItem = document.querySelector(`.note-list > li[data-id="${note.id}"]`);
 
     // update date
     let noteDate = getNoteDate(note.lastUpdated);
@@ -466,7 +471,7 @@ noteBody.addEventListener('keyup', e => {
 });
 
 // notes list
-const notesList = document.querySelector('#notes-list');
+const notesList = document.querySelector('.note-list');
 
 notesList.addEventListener('click', (e) => {
 
@@ -489,10 +494,6 @@ notesList.addEventListener('click', (e) => {
 
         // in case user deletes the current note
         if (noteId == quireData.currentNote) {
-
-            // update currentNote
-            quireData.currentNote = 0;
-            quireIO.updateData(quireData)
 
             // clear the editor
             tinyMCE.activeEditor.setContent('');
@@ -533,7 +534,7 @@ navbarMenu.addEventListener('click', (e) => {
         case 'new-note': {
 
             //reset search function
-            if (searchStarred.classList.contains('fas')) searchStarred.classList.remove('fas')
+            document.querySelector('#starred-search').checked = false;
             document.querySelector('#search').value = ""
 
             // then we create the new note (which returns its id)
@@ -552,15 +553,15 @@ navbarMenu.addEventListener('click', (e) => {
             document.querySelector('.menu').classList.remove('show');
 
             // show notes lists
-            document.querySelector('.notes-list').classList.remove('hide');
+            document.querySelector('.note-list-container').classList.remove('hide');
 
             // hide other submenus
             document.querySelector('.settings-container').classList.add('hide');
             document.querySelector('.statistics-container').classList.add('hide');
 
-            // 
-            document.querySelector("#nav-title").innerText = "Browse notes";
-            document.querySelector(".search-toolbar").style.display = "flex";
+            // change menu title
+            document.querySelector("#menu-title").innerText = "Browse notes";
+            // document.querySelector(".search-toolbar").style.display = "flex";
 
             break
         }
@@ -579,15 +580,14 @@ navbarMenu.addEventListener('click', (e) => {
             }
 
             // show notes lists
-            document.querySelector('.notes-list').classList.remove('hide');
+            document.querySelector('.note-list-container').classList.remove('hide');
 
             // hide other submenus
             document.querySelector('.settings-container').classList.add('hide');
             document.querySelector('.statistics-container').classList.add('hide');
 
-            //
-            document.querySelector("#nav-title").innerText = "Browse notes";
-            document.querySelector(".search-toolbar").style.display = "flex";
+            // change menu title
+            document.querySelector("#menu-title").innerText = "Browse notes";
 
             // render notes list
             renderNotesList();
@@ -609,11 +609,11 @@ navbarMenu.addEventListener('click', (e) => {
 
             // hide other submenus
             document.querySelector('.settings-container').classList.add('hide');
-            document.querySelector('.notes-list').classList.add('hide');
+            document.querySelector('.note-list-container').classList.add('hide');
 
-            //
-            document.querySelector("#nav-title").innerText = "Statistics";
-            document.querySelector(".search-toolbar").style.display = "none";
+            // change menu title
+            document.querySelector("#menu-title").innerText = "Statistics";
+            
 
             break
         }
@@ -632,11 +632,10 @@ navbarMenu.addEventListener('click', (e) => {
 
             // hide other submenus
             document.querySelector('.statistics-container').classList.add('hide');
-            document.querySelector('.notes-list').classList.add('hide');
+            document.querySelector('.note-list-container').classList.add('hide');
 
-            //
-            document.querySelector("#nav-title").innerText = "Settings";
-            document.querySelector(".search-toolbar").style.display = "none";
+            // change menu title
+            document.querySelector("#menu-title").innerText = "Settings";
 
             break
         }
@@ -745,26 +744,22 @@ templateContent.addEventListener('click', (e) => {
 })
 
 const searchInput = document.querySelector('#search');
-const searchStarred = document.querySelector('.search-toolbar > i');
+const searchStarred = document.querySelector('#starred-search');
 
 searchInput.addEventListener('keyup', function (string) {
 
     let searchString = ''
-    let searchStar
+    let searchStar = searchStarred.checked;
 
     searchString += string.target.value
-    searchStarred.classList.contains('fas') ? searchStar = true : searchStar = false;
 
     searchNotesList(searchString, searchStar)
 })
 
 searchStarred.addEventListener('click', function () {
-    searchStarred.classList.toggle('fas');
 
     let searchString = searchInput.value
-    let searchStar
-
-    searchStarred.classList.contains('fas') ? searchStar = true : searchStar = false;
+    let searchStar = searchStarred.checked;
 
     searchNotesList(searchString, searchStar)
 })
@@ -775,7 +770,7 @@ const searchNotesList = (searchString = '', searchStar = false) => {
 
     quireData.notes.sort((noteA, noteB) => Number(noteB.lastUpdated) - Number(noteA.lastUpdated));
 
-    let notesList = document.querySelector('.notes-list');
+    let notesList = document.querySelector('.note-list');
     notesList.innerHTML = '';
 
     quireData.notes.forEach(note => {

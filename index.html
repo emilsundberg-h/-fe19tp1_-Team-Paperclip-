@@ -55,15 +55,21 @@
     </nav>
 
     <aside class="menu">
-        <div class="menu-toolbar">
-            <h2 id="nav-title">Browse notes</h2>
-        </div>
-        <div class="search-toolbar">
-            <label for="search"><input type="text" id="search" name="search" placeholder="Search notes"></label>
-            <i class="starred far fa-star" title="Show only starred notes"></i>
+        <div class="menu-header">
+            <h2 id="menu-title">Browse notes</h2>
         </div>
 
-        <ul class="notes-list" id="notes-list"></ul>
+        <div class="note-list-container">
+
+            <div class="search-container">
+                <input type="search" name="search" id="search" placeholder="Search...">
+                <input type="checkbox" name="starred-search" id="starred-search">
+                <label for="starred-search" title="Show only starred notes"></label>
+            </div>
+
+            <ul class="note-list"></ul>
+
+        </div>
 
         <div class="statistics-container hide"></div>
 
