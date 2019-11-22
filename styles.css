@@ -207,9 +207,10 @@ h2{
   outline: none;
 }
 
-.no-search-result{
+.note-list-no-results {
   padding: 8px;
   font-size: 14px;
+  color: var(--secondary-text-color);
 }
 
 .note-list-container,

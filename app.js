@@ -343,39 +343,44 @@ const renderNotesList = () => {
     // clear notes list
     notesList.innerHTML = "";
 
-    // sort the array based on last updated date
-    quireData.notes.sort((noteA, noteB) => Number(noteB.lastUpdated) - Number(noteA.lastUpdated));
+    if (!quireData.notes.length) {
+        notesList.innerHTML = '<div class="note-list-no-results">No notes found... create one to get started!</div>';
+        
+    } else {
+        // sort the array based on last updated date
+        quireData.notes.sort((noteA, noteB) => Number(noteB.lastUpdated) - Number(noteA.lastUpdated));
 
-    quireData.notes.forEach(note => {
+        quireData.notes.forEach(note => {
 
-        // get note body
-        let noteBody = parseNoteBodyHTML(note.body);
+            // get note body
+            let noteBody = parseNoteBodyHTML(note.body);
 
-        // get title
-        let noteTitle = getNotePreview(noteBody)[0];
+            // get title
+            let noteTitle = getNotePreview(noteBody)[0];
 
-        // get preview
-        let notePreview = getNotePreview(noteBody)[1];
+            // get preview
+            let notePreview = getNotePreview(noteBody)[1];
 
-        // get date
-        let noteDate = getNoteDate(note.lastUpdated);
-        let noteDateISO = getNoteDateISO(note.lastUpdated);
+            // get date
+            let noteDate = getNoteDate(note.lastUpdated);
+            let noteDateISO = getNoteDateISO(note.lastUpdated);
 
-        // print HTML
-        notesList.innerHTML +=
-            `<li class="note-list-item ${quireData.currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
-                <div class="note-list-meta-container">
-                    <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
-                    <div class="note-list-icons">
-                        <button class= "delete-button" title="Delete note"></button>
-                        <input type="checkbox" name="star-${note.id}" id="star-${note.id}" class="starred-checkbox" ${note.starred ? "checked" : ""}>
-                        <label for="star-${note.id}" title="${note.starred ? 'Unstar note' : 'Star note'}"></label>
+            // print HTML
+            notesList.innerHTML +=
+                `<li class="note-list-item ${quireData.currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
+                    <div class="note-list-meta-container">
+                        <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
+                        <div class="note-list-icons">
+                            <button class= "delete-button" title="Delete note"></button>
+                            <input type="checkbox" name="star-${note.id}" id="star-${note.id}" class="starred-checkbox" ${note.starred ? "checked" : ""}>
+                            <label for="star-${note.id}" title="${note.starred ? 'Unstar note' : 'Star note'}"></label>
+                        </div>
                     </div>
-                </div>
-                <a href="#" class="note-list-link"><h3 class="note-list-title">${noteTitle}</h3></a>
-                <span class="note-list-preview">${notePreview}</span>
-            </li>`;
-    });
+                    <a href="#" class="note-list-link"><h3 class="note-list-title">${noteTitle}</h3></a>
+                    <span class="note-list-preview">${notePreview}</span>
+                </li>`;
+        });
+    }
 }
 
 // update note in notes list
@@ -803,7 +808,7 @@ const searchNotesList = (searchString = '', searchStar = false) => {
     })
     if (notesList.innerHTML == '') {
         notesList.innerHTML =
-            `<div class="no-search-result"><i>No ${(searchStar) ? "starred" : ""} notes 
+            `<div class="note-list-no-results"><i>No ${(searchStar) ? "starred" : ""} notes 
         ${(searchString) ? 'with ' + '"' + searchString + '"' : ""} found.</i ></div > `;
     }
 }
