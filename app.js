@@ -10,6 +10,7 @@ tinymce.init({
     menubar: false,
     branding: false,
     inline: true,
+    contextmenu: false,
     skin: 'oxide-dark',
     plugins: 'lists image code link print textpattern wordcount',
 
