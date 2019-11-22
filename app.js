@@ -175,7 +175,7 @@ const quireIO = (function () {
                 let note = quireData.notes[noteIndex];
 
                 note.starred = !note.starred;
-                note.lastUpdated = Date.now();
+                //note.lastUpdated = Date.now();
 
                 this.updateData(quireData);
             }
@@ -344,8 +344,8 @@ const renderNotesList = () => {
     notesList.innerHTML = "";
 
     if (!quireData.notes.length) {
-        notesList.innerHTML = '<div class="note-list-no-results">No notes found... create one to get started!</div>';
-        
+        notesList.innerHTML = '<div class="note-list-no-results"><i>No notes found... create one to get started!</></div>';
+
     } else {
         // sort the array based on last updated date
         quireData.notes.sort((noteA, noteB) => Number(noteB.lastUpdated) - Number(noteA.lastUpdated));
@@ -376,9 +376,10 @@ const renderNotesList = () => {
                             <label for="star-${note.id}" title="${note.starred ? 'Unstar note' : 'Star note'}"></label>
                         </div>
                     </div>
-                    <a href="#" class="note-list-link"><h3 class="note-list-title">${noteTitle}</h3></a>
-                    <span class="note-list-preview">${notePreview}</span>
-                </li>`;
+                </div>
+                <a href="#" class="note-list-link"><h3 class="note-list-title">${noteTitle}</h3></a>
+                <span class="note-list-preview">${notePreview}</span>
+            </li>`;
         });
     }
 }
@@ -476,50 +477,54 @@ const notesList = document.querySelector('.note-list');
 
 notesList.addEventListener('click', (e) => {
 
-    // look up id of clicked note
-    let noteId = Number(e.target.closest("li").dataset.id);
+    //Check if user clicked outside list
+    if (e.target.tagName !== 'UL') {
 
-    // toggle starred status if star is pressed
-    if (e.target.classList.contains('starred-checkbox')) {
+        // look up id of clicked note
+        let noteId = Number(e.target.closest("li").dataset.id);
 
-        quireIO.toggleStarredStatus(noteId);
+        // toggle starred status if star is pressed
+        if (e.target.classList.contains('starred-checkbox')) {
 
-    // delete note if trash can is pressed
-    } else if (e.target.classList.contains("delete-button")) {
+            quireIO.toggleStarredStatus(noteId);
 
-        let quireData = quireIO.getData();
+            // delete note if trash can is pressed
+        } else if (e.target.classList.contains("delete-button")) {
 
-        // TODO: add user validation prior to deleting
+            let quireData = quireIO.getData();
 
-        // in case user deletes the current note
-        if (noteId == quireData.currentNote) {
+            // TODO: add user validation prior to deleting
 
-            // clear the editor
-            tinyMCE.activeEditor.setContent('');
+            // in case user deletes the current note
+            if (noteId == quireData.currentNote) {
+
+                // clear the editor
+                tinyMCE.activeEditor.setContent('');
+            }
+
+            quireIO.deleteNote(noteId);
+
+            //Check if notelist is in search mode
+            if (document.querySelector('#search').value == "" && !searchStarred.checked) {
+                renderNotesList();
+            } else {
+                let searchStar = false;
+                let searchString = document.querySelector('#search').value;
+                if (searchStarred.checked) searchStar = true;
+                searchNotesList(searchString, searchStar);
+            }
+
+            // else just render the note
+            // pressing the star triggers the click event twice hence the label condition
+        } else if (e.target.tagName !== 'LABEL') {
+
+            renderNote(noteId);
+
+            updateNoteInNotesList(noteId);
+
+            // hide menu on mobile
+            document.querySelector('.menu').classList.remove('show');
         }
-
-        quireIO.deleteNote(noteId);
-
-        //Check if notelist is in search mode
-        if (document.querySelector('#search').value == "" && !searchStarred.checked) {
-            renderNotesList();
-        } else {
-            let searchStar = false;
-            let searchString = document.querySelector('#search').value;
-            if (searchStarred.checked) searchStar = true;
-            searchNotesList(searchString, searchStar);
-        }
-
-    // else just render the note
-    // pressing the star triggers the click event twice hence the label condition
-    } else if (e.target.tagName !== 'LABEL') {
-
-        renderNote(noteId);
-
-        updateNoteInNotesList(noteId);
-
-        // hide menu on mobile
-        document.querySelector('.menu').classList.remove('show');
     }
 });
 
@@ -809,6 +814,6 @@ const searchNotesList = (searchString = '', searchStar = false) => {
     if (notesList.innerHTML == '') {
         notesList.innerHTML =
             `<div class="note-list-no-results"><i>No ${(searchStar) ? "starred" : ""} notes 
-        ${(searchString) ? 'with ' + '"' + searchString + '"' : ""} found.</i ></div > `;
+        ${(searchString) ? 'with ' + '"' + searchString + '"' : ""} found.</i ></div>`;
     }
 }
