@@ -4,7 +4,7 @@
 
 tinymce.init({
     selector: '#note-body',
-    toolbar: 'bold italic strikethrough underline h2 h3 | bullist numlist blockquote image link print wordcount Template |',
+    toolbar: 'bold italic strikethrough underline h2 h3 | bullist numlist blockquote image link print wordcount fontselect Template |',
     fixed_toolbar_container: '#note-toolbar',
     toolbar_drawer: 'sliding',
     menubar: false,
@@ -12,7 +12,8 @@ tinymce.init({
     inline: true,
     contextmenu: false,
     skin: 'oxide-dark',
-    plugins: 'lists image code link print textpattern wordcount',
+    plugins: 'lists image code link print textpattern wordcount fontsizeselect',
+    fontsize_formats: '11px 12px 14px 16px 18px 24px 36px 48px',
 
     setup: (editor) => {
         editor.ui.registry.addButton('Template', {
@@ -452,8 +453,14 @@ window.addEventListener('DOMContentLoaded', e => {
 
 // page load
 window.addEventListener('load', e => {
-
+    
     let quireData = quireIO.getData();
+    if(quireData.currentNote===null){
+        console.log("inga notes");
+        let newNoteId = quireIO.createNote('<h1>Välkommen till din anteckningsbok Quire!</h1><p></p><br></p><blockquote><p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img src="quire_notebook.jpg" alt="" width="362" height="362"></p></blockquote><p><br></p><p>Så kul att du hittat hit. Vi hoppas att Quire från och med nu kommer vara plattformen för alla dina anteckningar. Låt oss öka chanserna för detta genom att berätta om några funktioner.</p><p><br></p><p><strong>Autospara</strong></p><p>Allting sparas automatiskt så du behöver aldrig vara orolig över att någonting försvinner.&nbsp;</p><p><br></p><p><strong>Sök</strong></p><p>Du söker genom hela innehållet och inte bara titlar. Vill du bara söka på dina stjärnmarkerade inlägg, klicka på stjärnan i sökfunktionen.</p><p><br></p><p><strong>Dark mode</strong></p><p>Visst är det så att när man ligger där i sängen och vrider på sig, det är då man kommer på de allra smartaste sakerna och tecknar man inte ned dem som är det börtglömt till morgonen. Var snäll mot dig själv och dina ögon genom att slå på dark mode när du skriver ned dina saker på småtimmarna. Du hittar dark mode under inställningar i vänsterkollumnen.</p><p><br></p><p><strong>Stjärnmarkering</strong></p><p>Välj ut dina speciella anteckningar genom att klicka i stjärnan. För att visa alla stjärnmarkeringar klickar du bara på stjärnan bredvid sökfältet.</p><p><br></p><p><strong>Mallar</strong></p><p>Behöver du ett snyggt CV eller en att-göra-lista? Längst upp till höger i verktygslistan finns det färdiga mallar för ändåmålet. Om du vill komma åt den här anteckningen igen, så hittar du den i mallar.</p><p><br></p><p><strong>Utskrift</strong></p><p>Digitala anteckningar i all ära, men beöhver du skriva ut dina anteckningar behöver du inte vara orolig över att något annat än just den valda anteckningen skrivs ut.</p><p><br></p>');
+
+        quireData.currentNote = newNoteId;
+    }
 
     renderNote(quireData.currentNote);
 
@@ -817,3 +824,4 @@ const searchNotesList = (searchString = '', searchStar = false) => {
         ${(searchString) ? 'with ' + '"' + searchString + '"' : ""} found.</i ></div>`;
     }
 }
+
