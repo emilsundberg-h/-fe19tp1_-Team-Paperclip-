@@ -269,7 +269,7 @@ const quireIO = (function () {
             // remove tag globally TODO: only remove globally when the last occurance of the tag is removed
             let globalTagIndex = getTagIndex('global', tagId);
 
-            if (globalTagIndex === false) {                
+            if (globalTagIndex === false) {
             } else {
 
                 quireData.tags.splice(globalTagIndex, 1);
@@ -326,13 +326,28 @@ const getNotePreview = noteBody => {
             notePreview = row;
     })
 
+    //Under construction
+    const isOverflown = (e) => {
+        return e.scrollHeight > e.clientHeight || e.scrollWidth > e.clientWidth;
+    }
+    // let titleLength
+
+    // let listPreview = document.querySelector('.note-list-item-current > a > h3')
+    // if (listPreview) {
+    //     if (isOverflown(listPreview) && !titleLength) {
+    //         titleLength = words.length
+    //         console.log(words.length)
+    //     }
+
+    // console.log(isOverflown(listPreview))
     if (notePreview.trim().length < 1 && words.length > 4) {
         noteTitle = `${words[0]} ${words[1]} ${words[2]} ${words[3]}...`;
         notePreview = `...${noteBody.substring(noteTitle.length - 2)}`;
     }
+    // }
 
     if (!noteTitle || noteTitle === ' ') noteTitle = 'No title...';
-    if (!notePreview || notePreview.length < 1) notePreview = '<i>No preview...</i>';
+    if (!notePreview || notePreview.trim().length < 1) notePreview = '<i>No preview...</i>';
 
     arrNotePreview.push(noteTitle, notePreview);
     return arrNotePreview;
@@ -487,7 +502,7 @@ const updateNoteInNotesList = noteId => {
     });
 
     tagList.innerHTML = noteTagsHTML;
-    
+
     // update current note status
     let currentNote = quireIO.getData().currentNote;
 
@@ -523,9 +538,9 @@ window.addEventListener('DOMContentLoaded', e => {
 
 // page load
 window.addEventListener('load', e => {
-    
+
     let quireData = quireIO.getData();
-    if(quireData.currentNote===null){
+    if (quireData.currentNote === null) {
         console.log("inga notes");
         let newNoteId = quireIO.createNote('<h1>Välkommen till din anteckningsbok Quire!</h1><p></p><br></p><blockquote><p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img src="quire_notebook.jpg" alt="" width="362" height="362"></p></blockquote><p><br></p><p>Så kul att du hittat hit. Vi hoppas att Quire från och med nu kommer vara plattformen för alla dina anteckningar. Låt oss öka chanserna för detta genom att berätta om några funktioner.</p><p><br></p><p><strong>Autospara</strong></p><p>Allting sparas automatiskt så du behöver aldrig vara orolig över att någonting försvinner.&nbsp;</p><p><br></p><p><strong>Sök</strong></p><p>Du söker genom hela innehållet och inte bara titlar. Vill du bara söka på dina stjärnmarkerade inlägg, klicka på stjärnan i sökfunktionen.</p><p><br></p><p><strong>Dark mode</strong></p><p>Visst är det så att när man ligger där i sängen och vrider på sig, det är då man kommer på de allra smartaste sakerna och tecknar man inte ned dem som är det börtglömt till morgonen. Var snäll mot dig själv och dina ögon genom att slå på dark mode när du skriver ned dina saker på småtimmarna. Du hittar dark mode under inställningar i vänsterkollumnen.</p><p><br></p><p><strong>Stjärnmarkering</strong></p><p>Välj ut dina speciella anteckningar genom att klicka i stjärnan. För att visa alla stjärnmarkeringar klickar du bara på stjärnan bredvid sökfältet.</p><p><br></p><p><strong>Mallar</strong></p><p>Behöver du ett snyggt CV eller en att-göra-lista? Längst upp till höger i verktygslistan finns det färdiga mallar för ändåmålet. Om du vill komma åt den här anteckningen igen, så hittar du den i mallar.</p><p><br></p><p><strong>Utskrift</strong></p><p>Digitala anteckningar i all ära, men beöhver du skriva ut dina anteckningar behöver du inte vara orolig över att något annat än just den valda anteckningen skrivs ut.</p><p><br></p>');
 
@@ -592,7 +607,7 @@ notesList.addEventListener('click', (e) => {
             }
 
 
-        // tagging
+            // tagging
         } else if (e.target.classList.contains('tag-button')) {
 
             // show tag container if hidden
@@ -610,7 +625,7 @@ notesList.addEventListener('click', (e) => {
             });
 
         } else if (e.target.classList.contains('tag-delete-button')) {
-            
+
             let tagId = Number(e.target.closest('.tag').dataset.tagid);
 
             // remove tag from local storage
@@ -620,8 +635,8 @@ notesList.addEventListener('click', (e) => {
             updateNoteInNotesList(noteId);
 
 
-        // else just render the note
-        // pressing the star triggers the click event twice hence the label condition
+            // else just render the note
+            // pressing the star triggers the click event twice hence the label condition
         } else if (e.target.tagName !== 'LABEL') {
 
             renderNote(noteId);
@@ -635,7 +650,7 @@ notesList.addEventListener('click', (e) => {
 });
 
 notesList.addEventListener('keyup', (e) => {
-        
+
     if (e.key === 'Enter') {
 
         // look up id of clicked note
@@ -652,7 +667,7 @@ notesList.addEventListener('keyup', (e) => {
 
         // reset input field
         notesList.querySelector(`#tag-input-${noteId}`).value = '';
-    }      
+    }
 
 });
 
@@ -899,6 +914,17 @@ searchStarred.addEventListener('click', function (e) {
     searchNotesList(searchString, searchStar);
 })
 
+const checkSearchWords = (noteBody, arrSearchString) => {
+
+    let numberOfSearchHits = 0;
+
+    arrSearchString.forEach(searchWord => {
+        if (noteBody.toLowerCase().includes(searchWord.trim())) numberOfSearchHits++;
+    })
+
+    return (numberOfSearchHits === arrSearchString.length) ? true : false
+}
+
 const searchNotesList = (searchString = '', searchStar = false) => {
 
     let quireData = quireIO.getData();
@@ -907,9 +933,19 @@ const searchNotesList = (searchString = '', searchStar = false) => {
 
     let notesList = document.querySelector('.note-list');
     notesList.innerHTML = '';
+    let arrSearchString = [];
+
+    if (searchString.includes(' ')) {
+        arrSearchString.push(...searchString.trim().toLowerCase().split(' '));
+    } else {
+        arrSearchString.push(searchString.toLowerCase().trim())
+    }
 
     quireData.notes.forEach(note => {
+
         let noteBody = parseNoteBodyHTML(note.body);
+
+        // Check for separate search words
 
         // get title
         let noteTitle = getNotePreview(noteBody)[0];
@@ -931,9 +967,7 @@ const searchNotesList = (searchString = '', searchStar = false) => {
                             </li>`;
         });
 
-        if (noteBody.toLowerCase().includes(searchString.toLowerCase())
-            && (note.starred == true || note.starred == searchStar)) {
-
+        if (checkSearchWords(noteBody, arrSearchString) && (note.starred == true || note.starred == searchStar)) {
             notesList.innerHTML +=
                 `<li class="note-list-item ${quireData.currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
                     <div class="note-list-meta-container">
