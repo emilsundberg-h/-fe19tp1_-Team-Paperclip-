@@ -233,7 +233,7 @@ const quireIO = (function () {
 
                 let noteIndex = this.getNoteIndex(noteId);
 
-                if (noteIndex) {
+                if (noteIndex !== false) {
                     quireData.notes[noteIndex].tags.push(tag);
                 }
             }
@@ -242,10 +242,49 @@ const quireIO = (function () {
         },
 
         // remove tag
-        removeTag: function () {
+        removeTag: function (tagId, noteId) {
+            let quireData = this.getData();
 
-            // TODO: create method
-            console.log('I do nothing at the moment :/');
+            let noteIndex = this.getNoteIndex(noteId);
+
+            // get tag index
+            const getTagIndex = (scope = 'local', tagId) => {
+
+                let tagIndex;
+
+                if (scope === 'global') {
+                    tagIndex = quireData.tags.findIndex(tag => tag.id === tagId);
+                } else if (scope === 'local') {
+                    tagIndex = quireData.notes[noteIndex].tags.findIndex(tag => tag.id === tagId);
+                }
+
+                if (tagIndex === -1) {
+                    console.log('tag NOT found...');
+                    return false;
+                } else {
+                    return tagIndex;
+                }
+            }
+
+            // remove tag globally TODO: only remove globally when the last occurance of the tag is removed
+            let globalTagIndex = getTagIndex('global', tagId);
+
+            if (globalTagIndex === false) {                
+            } else {
+
+                quireData.tags.splice(globalTagIndex, 1);
+            }
+
+            // remove tag locally 
+            let localTagIndex = getTagIndex('local', tagId);
+
+            if (localTagIndex === false) {
+            } else {
+
+                quireData.notes[noteIndex].tags.splice(localTagIndex, 1);
+            }
+
+            this.updateData(quireData);
         }
     };
 })();
@@ -366,13 +405,24 @@ const renderNotesList = () => {
             let noteDate = getNoteDate(note.lastUpdated);
             let noteDateISO = getNoteDateISO(note.lastUpdated);
 
+            // get tags
+            let noteTagsHTML = '';
+
+            note.tags.forEach(tag => {
+                noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
+                                    <span>${tag.name}</span>
+                                    <button class="tag-delete-button">x</button>
+                                </li>`
+            });
+
             // print HTML
             notesList.innerHTML +=
                 `<li class="note-list-item ${quireData.currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
                     <div class="note-list-meta-container">
                         <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
                         <div class="note-list-icons">
-                            <button class= "delete-button" title="Delete note"></button>
+                            <button class="tag-button" title="Add tags"></button>
+                            <button class= "delete-button" title="Delete note"></button >
                             <input type="checkbox" name="star-${note.id}" id="star-${note.id}" class="starred-checkbox" ${note.starred ? "checked" : ""}>
                             <label for="star-${note.id}" title="${note.starred ? 'Unstar note' : 'Star note'}"></label>
                         </div>
@@ -380,6 +430,10 @@ const renderNotesList = () => {
                 </div>
                 <a href="#" class="note-list-link"><h3 class="note-list-title">${noteTitle}</h3></a>
                 <span class="note-list-preview">${notePreview}</span>
+                <div class="tag-container ${note.tags.length ? '' : 'hide'}" id="tag-container-${note.id}">
+                    <ul class="tag-list">${noteTagsHTML}</ul>
+                    <input class="tag-input hide" type="text" id="tag-input-${note.id}" placeholder="Add tag..." />
+                </div>
             </li>`;
         });
     }
@@ -418,6 +472,22 @@ const updateNoteInNotesList = noteId => {
 
     noteListItem.querySelector('.note-list-preview').innerHTML = notePreview;
 
+    // update tags
+    let tagList = noteListItem.querySelector('.tag-list');
+
+    tagList.innerHTML = '';
+
+    let noteTagsHTML = '';
+
+    note.tags.forEach(tag => {
+        noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
+                            <span>${tag.name}</span>
+                            <button class="tag-delete-button">x</button>
+                        </li>`
+    });
+
+    tagList.innerHTML = noteTagsHTML;
+    
     // update current note status
     let currentNote = quireIO.getData().currentNote;
 
@@ -488,7 +558,7 @@ notesList.addEventListener('click', (e) => {
     if (e.target.tagName !== 'UL') {
 
         // look up id of clicked note
-        let noteId = Number(e.target.closest("li").dataset.id);
+        let noteId = Number(e.target.closest('.note-list-item').dataset.id);
 
         // toggle starred status if star is pressed
         if (e.target.classList.contains('starred-checkbox')) {
@@ -521,8 +591,37 @@ notesList.addEventListener('click', (e) => {
                 searchNotesList(searchString, searchStar);
             }
 
-            // else just render the note
-            // pressing the star triggers the click event twice hence the label condition
+
+        // tagging
+        } else if (e.target.classList.contains('tag-button')) {
+
+            // show tag container if hidden
+            const tagContainer = notesList.querySelector(`#tag-container-${noteId}`);
+            tagContainer.classList.remove('hide');
+
+            // put cursor focus on input field
+            const tagInput = notesList.querySelector(`#tag-input-${noteId}`);
+            tagInput.classList.toggle('hide')
+            tagInput.focus();
+
+            // hide input on blur ("unfocus")
+            tagInput.addEventListener('blur', e => {
+                tagInput.classList.add('hide');
+            });
+
+        } else if (e.target.classList.contains('tag-delete-button')) {
+            
+            let tagId = Number(e.target.closest('.tag').dataset.tagid);
+
+            // remove tag from local storage
+            quireIO.removeTag(tagId, noteId);
+
+            // update note in DOM
+            updateNoteInNotesList(noteId);
+
+
+        // else just render the note
+        // pressing the star triggers the click event twice hence the label condition
         } else if (e.target.tagName !== 'LABEL') {
 
             renderNote(noteId);
@@ -533,6 +632,28 @@ notesList.addEventListener('click', (e) => {
             document.querySelector('.menu').classList.remove('show');
         }
     }
+});
+
+notesList.addEventListener('keyup', (e) => {
+        
+    if (e.key === 'Enter') {
+
+        // look up id of clicked note
+        let noteId = Number(e.target.closest('.note-list-item').dataset.id);
+
+        // get input value
+        let input = e.target.value;
+
+        // add note to local storage
+        quireIO.addTag(input, noteId)
+
+        // update DOM with new tag
+        updateNoteInNotesList(noteId);
+
+        // reset input field
+        notesList.querySelector(`#tag-input-${noteId}`).value = '';
+    }      
+
 });
 
 // navbar
@@ -800,6 +921,16 @@ const searchNotesList = (searchString = '', searchStar = false) => {
         let noteDate = getNoteDate(note.lastUpdated);
         let noteDateISO = getNoteDateISO(note.lastUpdated);
 
+        // get tags
+        let noteTagsHTML = '';
+
+        note.tags.forEach(tag => {
+            noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
+                                <span>${tag.name}</span>
+                                <button class="tag-delete-button">x</button>
+                            </li>`;
+        });
+
         if (noteBody.toLowerCase().includes(searchString.toLowerCase())
             && (note.starred == true || note.starred == searchStar)) {
 
@@ -808,6 +939,7 @@ const searchNotesList = (searchString = '', searchStar = false) => {
                     <div class="note-list-meta-container">
                         <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
                         <div class="note-list-icons">
+                            <button class="tag-button" title="Add tags"></button>
                             <button class= "delete-button" title="Delete note"></button>
                             <input type="checkbox" name="star-${note.id}" id="star-${note.id}" class="starred-checkbox" ${note.starred ? "checked" : ""}>
                             <label for="star-${note.id}" title="${note.starred ? 'Unstar note' : 'Star note'}"></label>
@@ -815,6 +947,10 @@ const searchNotesList = (searchString = '', searchStar = false) => {
                     </div>
                     <a href="#" class="note-list-link"><h3 class="note-list-title">${noteTitle}</h3></a>
                     <span class="note-list-preview">${notePreview}</span>
+                    <div class="tag-container ${note.tags.length ? '' : 'hide'}" id="tag-container-${note.id}">
+                        <ul class="tag-list">${noteTagsHTML}</ul>
+                        <input class="tag-input hide" type="text" id="tag-input-${note.id}" placeholder="Add tag..." />
+                    </div>
                 </li>`;
         }
     })
@@ -824,4 +960,3 @@ const searchNotesList = (searchString = '', searchStar = false) => {
         ${(searchString) ? 'with ' + '"' + searchString + '"' : ""} found.</i ></div>`;
     }
 }
-
