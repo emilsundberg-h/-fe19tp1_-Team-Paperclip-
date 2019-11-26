@@ -332,11 +332,19 @@ const quireIO = (function () {
 // Helper functions
 // ############
 
-// get note date in yyyy-mm-dd
-const getNoteDate = date => new Date(date).toISOString().slice(0, 10);
+// get note date
+const getNoteDateTitle = date => new Date(date).toUTCString();
 
 // get note date ISO
 const getNoteDateISO = date => new Date(date).toISOString();
+
+// get note date relative
+const getNoteDateRelative = date => {
+    
+    let ISODate = getNoteDateISO(date)
+
+    return moment(ISODate).fromNow();
+}
 
 // parse note body
 const parseNoteBodyHTML = noteBody => {
@@ -456,8 +464,9 @@ const renderNotesList = () => {
             let notePreview = getNotePreview(noteBody)[1];
 
             // get date
-            let noteDate = getNoteDate(note.lastUpdated);
+            let noteDateTitle = getNoteDateTitle(note.lastUpdated);
             let noteDateISO = getNoteDateISO(note.lastUpdated);
+            let NoteDateRelative = getNoteDateRelative(noteDateISO);
 
             // get tags
             let noteTagsHTML = '';
@@ -478,7 +487,7 @@ const renderNotesList = () => {
             notesList.innerHTML +=
                 `<li class="note-list-item ${quireData.currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
                     <div class="note-list-meta-container">
-                        <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
+                        <time datetime="${noteDateISO}" title="${noteDateTitle}" class="note-list-date">${NoteDateRelative}</time>
                         <div class="note-list-icons">
                             <button class="tag-button" title="Add tags"></button>
                             <button class= "delete-button" title="Delete note"></button>
@@ -510,11 +519,13 @@ const updateNoteInNotesList = noteId => {
     const noteListItem = document.querySelector(`.note-list > li[data-id="${note.id}"]`);
 
     // update date
-    let noteDate = getNoteDate(note.lastUpdated);
+    let noteDateTitle = getNoteDateTitle(note.lastUpdated);
     let noteDateISO = getNoteDateISO(note.lastUpdated);
+    let NoteDateRelative = getNoteDateRelative(noteDateISO);
 
-    noteListItem.querySelector('time').textContent = noteDate;
+    noteListItem.querySelector('time').textContent = NoteDateRelative;
     noteListItem.querySelector('time').setAttribute('datetime', noteDateISO);
+    noteListItem.querySelector('time').setAttribute('title', noteDateTitle);
 
     // update starred status
     let noteStar = noteListItem.querySelector('.starred-checkbox');
@@ -1105,8 +1116,9 @@ const searchNotesList = (searchString = '', searchStar = false) => {
         let notePreview = getNotePreview(noteBody)[1];
 
         // get date
-        let noteDate = getNoteDate(note.lastUpdated);
+        let noteDateTitle = getNoteDateTitle(note.lastUpdated);
         let noteDateISO = getNoteDateISO(note.lastUpdated);
+        let NoteDateRelative = getNoteDateRelative(noteDateISO);
 
         // get tags
         let noteTagsHTML = '';
@@ -1133,7 +1145,7 @@ const searchNotesList = (searchString = '', searchStar = false) => {
             notesList.innerHTML +=
                 `<li class="note-list-item ${quireData.currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
                     <div class="note-list-meta-container">
-                        <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
+                        <time datetime="${noteDateISO}" title="${noteDateTitle}" class="note-list-date">${NoteDateRelative}</time>
                         <div class="note-list-icons">
                             <button class="tag-button" title="Add tags"></button>
                             <button class= "delete-button" title="Delete note"></button>
