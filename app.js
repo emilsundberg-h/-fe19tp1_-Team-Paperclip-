@@ -202,89 +202,114 @@ const quireIO = (function () {
         },
 
         // add tag
-        addTag: function (tagName, noteId = 0) {
+        addTag: function(tagName, noteId) {
+
+          let noteIndex = this.getNoteIndex(noteId);
+
+          if (tagName && noteIndex !== false) {
+
             let quireData = this.getData();
+
+            tagName = tagName.toLowerCase();
 
             let tag;
 
-            // if the tag does not exist, then we create it
+            // if the tag does not already exist, create it
             if (!quireData.tags.some(tag => tag.name === tagName)) {
 
-                // corresponds to CSS classes
-                let tagColors = ['tag-blue', 'tag-red', 'tag-green', 'tag-orange'];
+              // corresponds to CSS classes
+              let tagColors = ['tag-blue', 'tag-red', 'tag-green', 'tag-orange'];
 
-                // create tag object
-                tag = {
-                    id: Date.now(),
-                    name: tagName,
-                    color: tagColors[Math.floor(Math.random() * tagColors.length)]
-                };
+              // create tag object
+              tag = {
+                  id: Date.now(),
+                  name: tagName,
+                  color: tagColors[Math.floor(Math.random() * tagColors.length)],
+                  assignedNotes: []
+              };
 
-                // add the tag to the global store
-                quireData.tags.push(tag);
+              // add the tag to the global store
+              quireData.tags.push(tag);
+              }
+
+            // then we assign "tag" to the tag object (which should be the same if just created)
+            tag = quireData.tags.filter(tag => tag.name === tagName)[0];
+
+            // make sure the note isn't already assigned to the tag
+            if (!tag.assignedNotes.includes(noteId)) {
+
+              // assign note to tag
+              tag.assignedNotes.push(noteId);
+
+              // assign tag to note
+              quireData.notes[noteIndex].tags.push(tag.id);
 
             } else {
-                // if the tag already exists then we assign the object to "tag"
-                tag = quireData.tags.filter(tag => tag.name === tagName)[0];
+
+              console.log('tag already added to this note')
             }
 
-            // if noteId is provided then we add the tag to the paticular note
-            if (noteId) {
+          this.updateData(quireData);
 
-                let noteIndex = this.getNoteIndex(noteId);
+          return tag.id;
 
-                if (noteIndex !== false) {
-                    quireData.notes[noteIndex].tags.push(tag);
-                }
-            }
+          } else {
+            console.log('no tag name provided or invalid note id');
+          }
+        },
 
-            this.updateData(quireData);
+        // get tag index
+        getTagIndex: function(tagId) {
+
+          let quireData = this.getData();
+
+          let tagIndex = quireData.tags.findIndex(tag => tag.id === tagId);
+
+          if (tagIndex === -1) {
+              console.log('tag NOT found...');
+              return false;
+          } else {
+              return tagIndex;
+          }
+        },
+
+        // get an array of all tags for a paticular note
+        getTags: function(noteId) {
+
+          let quireData = this.getData();
+
+          if (noteId) {
+            return quireData.tags.filter(tag => tag.assignedNotes.includes(noteId));
+          }
         },
 
         // remove tag
-        removeTag: function (tagId, noteId) {
+        removeTag: function(tagId, noteId) {
+
             let quireData = this.getData();
+
+            let tagIndex = this.getTagIndex(tagId);
 
             let noteIndex = this.getNoteIndex(noteId);
 
-            // get tag index
-            const getTagIndex = (scope = 'local', tagId) => {
-
-                let tagIndex;
-
-                if (scope === 'global') {
-                    tagIndex = quireData.tags.findIndex(tag => tag.id === tagId);
-                } else if (scope === 'local') {
-                    tagIndex = quireData.notes[noteIndex].tags.findIndex(tag => tag.id === tagId);
-                }
-
-                if (tagIndex === -1) {
-                    console.log('tag NOT found...');
-                    return false;
-                } else {
-                    return tagIndex;
-                }
-            }
-
-            // remove tag globally TODO: only remove globally when the last occurance of the tag is removed
-            let globalTagIndex = getTagIndex('global', tagId);
-
-            if (globalTagIndex === false) {
+            if (tagIndex === false) {
             } else {
 
-                quireData.tags.splice(globalTagIndex, 1);
-            }
+              // remove the note id from the tag
+              let assignedNotesArray = quireData.tags[tagIndex].assignedNotes;
+              assignedNotesArray.splice(assignedNotesArray.indexOf(noteId), 1);
 
-            // remove tag locally 
-            let localTagIndex = getTagIndex('local', tagId);
+              // remove the tag id from the note
+              let assignedTagsArray = quireData.notes[noteIndex].tags;
+              assignedTagsArray.splice(assignedTagsArray.indexOf(tagId), 1);
+            
+              // if there are no longer any notes assigned to the tag, delete the tag all together
+              if (assignedNotesArray.length <= 0) {
+                quireData.tags.splice(tagIndex, 1);
+              }
 
-            if (localTagIndex === false) {
-            } else {
-
-                quireData.notes[noteIndex].tags.splice(localTagIndex, 1);
-            }
-
-            this.updateData(quireData);
+              this.updateData(quireData);
+            }            
         }
     };
 })();
@@ -423,14 +448,19 @@ const renderNotesList = () => {
             // get tags
             let noteTagsHTML = '';
 
-            note.tags.forEach(tag => {
-                noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
-                                    <span>${tag.name.toLowerCase()}</span>
-                                    <button class="tag-delete-button">x</button>
-                                </li>`
-            });
+            if (note.tags.length > 0) {
 
-            // print HTML
+              let tags = quireIO.getTags(note.id);
+              
+              tags.forEach(tag => {
+                  noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
+                                      <span>${tag.name}</span>
+                                      <button class="tag-delete-button">x</button>
+                                  </li>`
+              });
+            }
+
+            // render HTML
             notesList.innerHTML +=
                 `<li class="note-list-item ${quireData.currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
                     <div class="note-list-meta-container">
@@ -442,14 +472,15 @@ const renderNotesList = () => {
                             <label for="star-${note.id}" title="${note.starred ? 'Unstar note' : 'Star note'}"></label>
                         </div>
                     </div>
-                </div>
-                <a href="#" class="note-list-link"><h3 class="note-list-title">${noteTitle}</h3></a>
-                <span class="note-list-preview">${notePreview}</span>
-                <div class="tag-container ${note.tags.length ? '' : 'hide'}" id="tag-container-${note.id}">
-                    <ul class="tag-list">${noteTagsHTML}</ul>
-                    <input class="tag-input hide" type="text" id="tag-input-${note.id}" placeholder="Add tag..." />
-                </div>
-            </li>`;
+                    <a href="#" class="note-list-link"><h3 class="note-list-title">${noteTitle}</h3></a>
+                    <span class="note-list-preview">${notePreview}</span>
+                    <ul class="note-list-tags">${noteTagsHTML}</ul>
+                    <div class="note-list-add-tag-container hide" id="add-tag-container-${note.id}">
+                        <input class="tag-input" type="text" id="tag-input-${note.id}" placeholder="Add tag..." />
+                        <span class="tag-search-text"></span>
+                        <ul class="tag-search-suggestions"></ul>
+                    </div>
+                  </li>`;
         });
     }
 }
@@ -488,18 +519,22 @@ const updateNoteInNotesList = noteId => {
     noteListItem.querySelector('.note-list-preview').innerHTML = notePreview;
 
     // update tags
-    let tagList = noteListItem.querySelector('.tag-list');
+    let tagList = noteListItem.querySelector('.note-list-tags');
 
     tagList.innerHTML = '';
-
     let noteTagsHTML = '';
 
-    note.tags.forEach(tag => {
-        noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
-                            <span>${tag.name.toLowerCase()}</span>
-                            <button class="tag-delete-button">x</button>
-                        </li>`
-    });
+    if (note.tags.length > 0) {
+
+      let tags = quireIO.getTags(note.id);
+      
+      tags.forEach(tag => {
+          noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
+                              <span>${tag.name}</span>
+                              <button class="tag-delete-button">x</button>
+                          </li>`
+      });
+    }
 
     tagList.innerHTML = noteTagsHTML;
 
@@ -526,7 +561,7 @@ const updateNoteInNotesList = noteId => {
 // Event listeners
 // ############
 
-// set theme
+// check for data and set theme
 window.addEventListener('DOMContentLoaded', e => {
 
     quireIO.checkData();
@@ -540,8 +575,9 @@ window.addEventListener('DOMContentLoaded', e => {
 window.addEventListener('load', e => {
 
     let quireData = quireIO.getData();
+
     if (quireData.currentNote === null) {
-        console.log("inga notes");
+
         let newNoteId = quireIO.createNote('<h1>Välkommen till din anteckningsbok Quire!</h1><p></p><br></p><blockquote><p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img src="quire_notebook.jpg" alt="" width="362" height="362"></p></blockquote><p><br></p><p>Så kul att du hittat hit. Vi hoppas att Quire från och med nu kommer vara plattformen för alla dina anteckningar. Låt oss öka chanserna för detta genom att berätta om några funktioner.</p><p><br></p><p><strong>Autospara</strong></p><p>Allting sparas automatiskt så du behöver aldrig vara orolig över att någonting försvinner.&nbsp;</p><p><br></p><p><strong>Sök</strong></p><p>Du söker genom hela innehållet och inte bara titlar. Vill du bara söka på dina stjärnmarkerade inlägg, klicka på stjärnan i sökfunktionen.</p><p><br></p><p><strong>Dark mode</strong></p><p>Visst är det så att när man ligger där i sängen och vrider på sig, det är då man kommer på de allra smartaste sakerna och tecknar man inte ned dem som är det börtglömt till morgonen. Var snäll mot dig själv och dina ögon genom att slå på dark mode när du skriver ned dina saker på småtimmarna. Du hittar dark mode under inställningar i vänsterkollumnen.</p><p><br></p><p><strong>Stjärnmarkering</strong></p><p>Välj ut dina speciella anteckningar genom att klicka i stjärnan. För att visa alla stjärnmarkeringar klickar du bara på stjärnan bredvid sökfältet.</p><p><br></p><p><strong>Mallar</strong></p><p>Behöver du ett snyggt CV eller en att-göra-lista? Längst upp till höger i verktygslistan finns det färdiga mallar för ändåmålet. Om du vill komma åt den här anteckningen igen, så hittar du den i mallar.</p><p><br></p><p><strong>Utskrift</strong></p><p>Digitala anteckningar i all ära, men beöhver du skriva ut dina anteckningar behöver du inte vara orolig över att något annat än just den valda anteckningen skrivs ut.</p><p><br></p>');
 
         quireData.currentNote = newNoteId;
@@ -567,7 +603,7 @@ noteBody.addEventListener('keyup', e => {
 // notes list
 const notesList = document.querySelector('.note-list');
 
-notesList.addEventListener('click', (e) => {
+notesList.addEventListener('click', e => {
 
     //Check if user clicked outside list
     if (e.target.tagName !== 'UL') {
@@ -580,7 +616,8 @@ notesList.addEventListener('click', (e) => {
 
             quireIO.toggleStarredStatus(noteId);
 
-            // delete note if trash can is pressed
+
+        // delete note if trash can is pressed
         } else if (e.target.classList.contains("delete-button")) {
 
             let quireData = quireIO.getData();
@@ -607,23 +644,19 @@ notesList.addEventListener('click', (e) => {
             }
 
 
-            // tagging
+        // add tag button is pressed
         } else if (e.target.classList.contains('tag-button')) {
 
             // show tag container if hidden
-            const tagContainer = notesList.querySelector(`#tag-container-${noteId}`);
-            tagContainer.classList.remove('hide');
+            const addTagContainer = notesList.querySelector(`#add-tag-container-${noteId}`);
+            addTagContainer.classList.remove('hide');
 
             // put cursor focus on input field
             const tagInput = notesList.querySelector(`#tag-input-${noteId}`);
-            tagInput.classList.toggle('hide')
             tagInput.focus();
 
-            // hide input on blur ("unfocus")
-            tagInput.addEventListener('blur', e => {
-                tagInput.classList.add('hide');
-            });
 
+        // delete tag button is pressed
         } else if (e.target.classList.contains('tag-delete-button')) {
 
             let tagId = Number(e.target.closest('.tag').dataset.tagid);
@@ -635,9 +668,26 @@ notesList.addEventListener('click', (e) => {
             updateNoteInNotesList(noteId);
 
 
-            // else just render the note
-            // pressing the star triggers the click event twice hence the label condition
-        } else if (e.target.tagName !== 'LABEL') {
+        // tag search suggestion is pressed
+        } else if (e.target.closest('.tag-search-suggestion-item')) {
+
+          let tagName = e.target.textContent;
+
+          quireIO.addTag(tagName, noteId)
+
+          updateNoteInNotesList(noteId)
+
+          let tagInput = notesList.querySelector(`#tag-input-${noteId}`);
+          tagInput.value = '';
+          tagInput.focus();
+
+          notesList.querySelector(`#add-tag-container-${noteId} > span`).innerText = '';
+          notesList.querySelector(`#add-tag-container-${noteId} > ul`).innerHTML = '';
+
+
+        // else just render the note
+        // pressing the star triggers the click event twice hence the label condition
+        } else if (e.target.tagName !== 'LABEL' && e.target.tagName !== 'INPUT') {
 
             renderNote(noteId);
 
@@ -649,26 +699,102 @@ notesList.addEventListener('click', (e) => {
     }
 });
 
-notesList.addEventListener('keyup', (e) => {
+notesList.addEventListener('keydown', e => {
 
-    if (e.key === 'Enter') {
+  // look up id of clicked note
+  let noteId = Number(e.target.closest('.note-list-item').dataset.id);
 
-        // look up id of clicked note
-        let noteId = Number(e.target.closest('.note-list-item').dataset.id);
+  // add tag when input field is in focus
+  if (e.keyCode === 13 && e.target.classList.contains('tag-input')) {
 
-        // get input value
-        let input = e.target.value;
+      // get input value
+      let input = e.target.value;
 
-        // add note to local storage
-        quireIO.addTag(input, noteId)
+      // add note to local storage
+      quireIO.addTag(input, noteId);
 
-        // update DOM with new tag
-        updateNoteInNotesList(noteId);
+      // update DOM with new tag
+      updateNoteInNotesList(noteId);
 
-        // reset input field
-        notesList.querySelector(`#tag-input-${noteId}`).value = '';
+      // reset input field
+      notesList.querySelector(`#tag-input-${noteId}`).value = '';
+      
+      // reset tag suggestions
+      notesList.querySelector(`#add-tag-container-${noteId} > span`).innerText = '';
+      notesList.querySelector(`#add-tag-container-${noteId} > ul`).innerHTML = '';
+  }
+
+  // add tag when suggestion item is in focus
+  if (e.keyCode === 13 && e.target.classList.contains('tag-search-suggestion-item')) {
+
+    // get tag name of the pressed suggestion
+    let tagName = e.target.textContent;
+
+    // add note to local storage
+    quireIO.addTag(tagName, noteId);
+
+    // update DOM with new tag
+    updateNoteInNotesList(noteId);
+
+    // reset input field and set focus
+    let tagInput = notesList.querySelector(`#tag-input-${noteId}`);
+
+    tagInput.value = '';
+    tagInput.focus();
+
+    // reset tag suggestions
+    notesList.querySelector(`#add-tag-container-${noteId} > span`).innerText = '';
+    notesList.querySelector(`#add-tag-container-${noteId} > ul`).innerHTML = '';
+  }
+
+  // TODO: look into making the search suggestions list possible to navigate using arrow keys and closed using esc
+
+});
+
+notesList.addEventListener('input', e => {
+
+  let quireData = quireIO.getData();
+
+  if (quireData.tags.length) {
+
+    let noteId = Number(e.target.closest('.note-list-item').dataset.id);
+
+    let noteIndex = quireIO.getNoteIndex(noteId);
+
+    // clear tag suggestions in DOM
+    let searchSuggestionsContainer = notesList.querySelector(`#add-tag-container-${noteId} > .tag-search-suggestions`);
+    searchSuggestionsContainer.innerHTML = '';
+
+    // filter existing tags based on search input and whats already assigned to the note
+    let searchInput = e.target.value;
+    let tagSearchResultsArray = quireData.tags.filter(tag => tag.name.includes(searchInput.toLowerCase()) && !(quireData.notes[noteIndex].tags.includes(tag.id)));
+
+    // list tag suggestions in DOM
+    tagSearchResultsArray.forEach(tag => {
+      searchSuggestionsContainer.innerHTML += `<li tabindex="0" class="tag-search-suggestion-item" data-tagid="${tag.id}"><span class="tag ${tag.color}">${tag.name}</span></li>`;
+    })
+
+    if (!tagSearchResultsArray.length) {
+      searchSuggestionsContainer.previousElementSibling.innerText = 'no tags found... press enter to add as a new tag';
+    } else {
+      searchSuggestionsContainer.previousElementSibling.innerText = 'pick from existing tags...';
     }
+  }
+});
 
+// hide tag suggestions container when notes list is no longer in focus
+// TODO: maybe exessive, consider cleaner solution?
+document.addEventListener('focusin', e => {
+
+  let addTagContainers = notesList.querySelectorAll('.note-list-add-tag-container');
+
+  if (!e.target.closest('.note-list')) {
+
+    addTagContainers.forEach(container => {
+      container.classList.add('hide');
+    });
+
+  }
 });
 
 // navbar
@@ -960,13 +1086,18 @@ const searchNotesList = (searchString = '', searchStar = false) => {
         let noteTagsHTML = '';
         let noteTagsList = '';
 
-        note.tags.forEach(tag => {
-            noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
-                                <span>${tag.name.toLowerCase()}</span>
-                                <button class="tag-delete-button">x</button>
-                            </li>`;
-            noteTagsList += tag.name
-        });
+        if (note.tags.length > 0) {
+
+          let tags = quireIO.getTags(note.id);
+          
+          tags.forEach(tag => {
+              noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
+                                  <span>${tag.name}</span>
+                                  <button class="tag-delete-button">x</button>
+                              </li>`;
+              noteTagsList += tag.name;
+          });
+        }
 
         let checkTags = checkSearchWords(noteTagsList, arrSearchString);
         let checkSearchString = checkSearchWords(noteBody, arrSearchString);
@@ -986,13 +1117,16 @@ const searchNotesList = (searchString = '', searchStar = false) => {
                     </div>
                     <a href="#" class="note-list-link"><h3 class="note-list-title">${noteTitle}</h3></a>
                     <span class="note-list-preview">${notePreview}</span>
-                    <div class="tag-container ${note.tags.length ? '' : 'hide'}" id="tag-container-${note.id}">
-                        <ul class="tag-list">${noteTagsHTML}</ul>
-                        <input class="tag-input hide" type="text" id="tag-input-${note.id}" placeholder="Add tag..." />
+                    <ul class="note-list-tags">${noteTagsHTML}</ul>
+                    <div class="note-list-add-tag-container hide" id="add-tag-container-${note.id}">
+                        <input class="tag-input" type="text" id="tag-input-${note.id}" placeholder="Add tag..." />
+                        <span class="tag-search-text"></span>
+                        <ul class="tag-search-suggestions"></ul>
                     </div>
-                </li>`;
+                  </li>`;
         }
     })
+
     if (notesList.innerHTML == '') {
         notesList.innerHTML =
             `<div class="note-list-no-results"><i>No ${(searchStar) ? "starred" : ""} notes 
