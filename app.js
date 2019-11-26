@@ -184,20 +184,34 @@ const quireIO = (function () {
 
         // delete note
         deleteNote: function (noteId) {
-            let quireData = this.getData();
+          let quireData = this.getData();
 
-            let noteIndex = this.getNoteIndex(noteId);
+          let noteIndex = this.getNoteIndex(noteId);
 
-            if (noteIndex === false) {
-            } else {
-                quireData.notes.splice(noteIndex, 1);
-                // quireData.notes[noteIndex].deleted = true; // TODO: currently note used
+          if (noteIndex === false) {
+          } else {
 
-                if (quireData.currentNote === noteId) {
-                    quireData.currentNote = 0;
-                }
+              // first remove note from any tags
+              if (quireData.notes[noteIndex].tags.length) {
 
-                this.updateData(quireData);
+                quireData.notes[noteIndex].tags.forEach(tagId => {
+                  quireIO.removeTag(tagId, noteId);
+                });
+
+                // update data with the note removed from all tags
+                quireData = this.getData();
+              }
+
+              // delete note
+              quireData.notes.splice(noteIndex, 1);
+              // quireData.notes[noteIndex].deleted = true; // TODO: currently note used
+
+              // update current note
+              if (quireData.currentNote === noteId) {
+                  quireData.currentNote = 0;
+              }
+
+              this.updateData(quireData);
             }
         },
 
