@@ -340,7 +340,7 @@ const getNoteDateISO = date => new Date(date).toISOString();
 
 // get note date relative
 const getNoteDateRelative = date => {
-    
+
     let ISODate = getNoteDateISO(date)
 
     return moment(ISODate).fromNow();
@@ -652,7 +652,10 @@ notesList.addEventListener('click', e => {
 
             //Confirm delete
             const confirmButton = notesList.querySelector(`#confirm-${noteId}`);
+
             confirmButton.classList.remove('hide');
+            trashcan.blur();
+
             confirmButton.addEventListener("click", e => {
 
                 confirmButton.classList.add('hide');
@@ -676,9 +679,9 @@ notesList.addEventListener('click', e => {
                     searchNotesList(searchString, searchStar);
                 }
             })
+
             confirmButton.addEventListener('mouseleave', e => {
                 confirmButton.classList.add('hide');
-                trashcan.blur();
             });
 
             // add tag button is pressed
