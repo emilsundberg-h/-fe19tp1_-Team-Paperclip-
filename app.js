@@ -425,7 +425,7 @@ const renderNotesList = () => {
 
             note.tags.forEach(tag => {
                 noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
-                                    <span>${tag.name}</span>
+                                    <span>${tag.name.toLowerCase()}</span>
                                     <button class="tag-delete-button">x</button>
                                 </li>`
             });
@@ -496,7 +496,7 @@ const updateNoteInNotesList = noteId => {
 
     note.tags.forEach(tag => {
         noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
-                            <span>${tag.name}</span>
+                            <span>${tag.name.toLowerCase()}</span>
                             <button class="tag-delete-button">x</button>
                         </li>`
     });
@@ -914,15 +914,14 @@ searchStarred.addEventListener('click', function (e) {
     searchNotesList(searchString, searchStar);
 })
 
-const checkSearchWords = (noteBody, arrSearchString) => {
+const checkSearchWords = (searchIn, arrSearchString) => {
 
-    let numberOfSearchHits = 0;
-
-    arrSearchString.forEach(searchWord => {
-        if (noteBody.toLowerCase().includes(searchWord.trim())) numberOfSearchHits++;
+    let result = true
+    arrSearchString.forEach((searchWord, i) => {
+        if (searchWord === arrSearchString[i + 1] && i < arrSearchString.length) searchWord += ' ' + arrSearchString[i + 1]
+        if (!searchIn.toLowerCase().includes(searchWord.trim())) result = false;
     })
-
-    return (numberOfSearchHits === arrSearchString.length) ? true : false
+    return result
 }
 
 const searchNotesList = (searchString = '', searchStar = false) => {
@@ -938,7 +937,7 @@ const searchNotesList = (searchString = '', searchStar = false) => {
     if (searchString.includes(' ')) {
         arrSearchString.push(...searchString.trim().toLowerCase().split(' '));
     } else {
-        arrSearchString.push(searchString.toLowerCase().trim())
+        arrSearchString.push(searchString.trim().toLowerCase())
     }
 
     quireData.notes.forEach(note => {
@@ -959,15 +958,21 @@ const searchNotesList = (searchString = '', searchStar = false) => {
 
         // get tags
         let noteTagsHTML = '';
+        let noteTagsList = '';
 
         note.tags.forEach(tag => {
             noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
-                                <span>${tag.name}</span>
+                                <span>${tag.name.toLowerCase()}</span>
                                 <button class="tag-delete-button">x</button>
                             </li>`;
+            noteTagsList += tag.name
         });
 
-        if (checkSearchWords(noteBody, arrSearchString) && (note.starred == true || note.starred == searchStar)) {
+        let checkTags = checkSearchWords(noteTagsList, arrSearchString);
+        let checkSearchString = checkSearchWords(noteBody, arrSearchString);
+
+        if ((checkSearchString && (note.starred == true || note.starred == searchStar))
+            || (checkTags && (note.starred == true || note.starred == searchStar))) {
             notesList.innerHTML +=
                 `<li class="note-list-item ${quireData.currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
                     <div class="note-list-meta-container">
