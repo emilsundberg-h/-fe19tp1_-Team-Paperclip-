@@ -4,16 +4,18 @@
 
 tinymce.init({
     selector: '#note-body',
-    toolbar: 'bold italic strikethrough underline h2 h3 | bullist numlist blockquote image link print wordcount fontselect Template |',
+    toolbar: 'bold italic strikethrough underline h2 h3 | bullist numlist blockquote image link print wordcount | fontselect Template |',
     fixed_toolbar_container: '#note-toolbar',
     toolbar_drawer: 'sliding',
     menubar: false,
     branding: false,
     inline: true,
     contextmenu: false,
-    skin: 'oxide-dark',
+    skin: 'oxide',
     plugins: 'lists image code link print textpattern wordcount fontsizeselect',
     fontsize_formats: '11px 12px 14px 16px 18px 24px 36px 48px',
+    content_css: ['https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans|Oswald|Raleway|Roboto&display=swap'],
+    font_formats: 'Arial=arial,Baskervville=Baskervville, serif;helvetica,sans-serif;Courier New=courier new,courier,monospace;Montserrat=Montserrat,sans-serif;Roboto=Roboto, sans-serif;Oswald=Oswald, sans-serif;Raleway=Raleway, sans-serif;',
 
     setup: (editor) => {
         editor.ui.registry.addButton('Template', {
