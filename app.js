@@ -481,7 +481,8 @@ const renderNotesList = () => {
                         <time datetime="${noteDateISO}" class="note-list-date">${noteDate}</time>
                         <div class="note-list-icons">
                             <button class="tag-button" title="Add tags"></button>
-                            <button class= "delete-button" title="Delete note"></button >
+                            <button class= "delete-button" title="Delete note"></button>
+                            <button class= "confirm-button hide" id="confirm-${note.id}" title="Confirm delete">Click to delete</button>
                             <input type="checkbox" name="star-${note.id}" id="star-${note.id}" class="starred-checkbox" ${note.starred ? "checked" : ""}>
                             <label for="star-${note.id}" title="${note.starred ? 'Unstar note' : 'Star note'}"></label>
                         </div>
@@ -637,26 +638,36 @@ notesList.addEventListener('click', e => {
             let quireData = quireIO.getData();
 
             // TODO: add user validation prior to deleting
+            const trashcan = e.target
+            const confirmButton = notesList.querySelector(`#confirm-${noteId}`);
+            confirmButton.classList.remove('hide');
+            confirmButton.addEventListener("click", e => {
 
-            // in case user deletes the current note
-            if (noteId == quireData.currentNote) {
+                confirmButton.classList.add('hide');
+                quireIO.deleteNote(noteId);
 
-                // clear the editor
-                tinyMCE.activeEditor.setContent('');
-            }
+                // in case user deletes the current note
+                if (noteId == quireData.currentNote) {
 
-            quireIO.deleteNote(noteId);
+                    // clear the editor
+                    tinyMCE.activeEditor.setContent('');
+                }
 
-            //Check if notelist is in search mode
-            if (document.querySelector('#search').value == "" && !searchStarred.checked) {
-                renderNotesList();
-            } else {
-                let searchStar = false;
-                let searchString = document.querySelector('#search').value;
-                if (searchStarred.checked) searchStar = true;
-                searchNotesList(searchString, searchStar);
-            }
 
+                //Check if notelist is in search mode
+                if (document.querySelector('#search').value == "" && !searchStarred.checked) {
+                    renderNotesList();
+                } else {
+                    let searchStar = false;
+                    let searchString = document.querySelector('#search').value;
+                    if (searchStarred.checked) searchStar = true;
+                    searchNotesList(searchString, searchStar);
+                }
+            })
+            confirmButton.addEventListener('mouseleave', e => {
+                confirmButton.classList.add('hide');
+                trashcan.blur();
+            });
 
         // add tag button is pressed
         } else if (e.target.classList.contains('tag-button')) {
@@ -1125,6 +1136,7 @@ const searchNotesList = (searchString = '', searchStar = false) => {
                         <div class="note-list-icons">
                             <button class="tag-button" title="Add tags"></button>
                             <button class= "delete-button" title="Delete note"></button>
+                            <button class= "confirm-button hide" id="confirm-${note.id}" title="Confirm delete">Click to delete</button>
                             <input type="checkbox" name="star-${note.id}" id="star-${note.id}" class="starred-checkbox" ${note.starred ? "checked" : ""}>
                             <label for="star-${note.id}" title="${note.starred ? 'Unstar note' : 'Star note'}"></label>
                         </div>

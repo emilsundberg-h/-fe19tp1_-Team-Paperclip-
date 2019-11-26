@@ -266,6 +266,8 @@ h2{
 }
 .note-list-icons {
   display: inline-block;
+    position: relative;
+
 }
 .fa-trash-alt{
 padding-right: 3px;
@@ -274,6 +276,22 @@ padding-right: 3px;
   padding-left: 3px;
   cursor: pointer;
 }
+.confirm-button{
+  background-color: red;
+  color: #fff;
+  font-size: 11px;
+  position: absolute;
+  left: 0;
+  right:0;
+  margin-left: auto;
+  margin-right: auto;
+  width:80px;
+  padding: 7px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
 .note-list-date {
   font-size: 11px;
   display: inline-block;
