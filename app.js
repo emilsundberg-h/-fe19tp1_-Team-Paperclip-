@@ -79,13 +79,21 @@ const quireIO = (function () {
             if (localStorage.getItem('quireData')) {
                 console.log('yay! found quire object');
             } else {
+
+                // check preferred system theme
+                let theme = 'light';
+                if (window.matchMedia('(prefers-color-scheme)').media !== 'not all') {
+                    window.matchMedia("(prefers-color-scheme: dark)").matches ? theme = 'dark' : theme = 'light';
+                }
+
+                // create quire data object
                 let quireData = {
-                    notes: [],
-                    currentNote: null,
-                    templates: [],
-                    tags: [],
-                    settings: { theme: 'light' }
-                };
+                        notes: [],
+                        currentNote: null,
+                        templates: [],
+                        tags: [],
+                        settings: { theme }
+                    };
 
                 localStorage.setItem('quireData', JSON.stringify(quireData));
                 localStorage.getItem('quireData')
@@ -596,8 +604,13 @@ window.addEventListener('DOMContentLoaded', e => {
 
     let quireData = quireIO.getData();
 
+    // set theme
     document.documentElement.setAttribute('data-theme', quireData.settings.theme);
-})
+
+    // set state of theme checkbox
+    let themeCheckbox = document.querySelector('input[name=themeCheckbox]');
+    quireData.settings.theme === 'dark' ? themeCheckbox.checked = true : themeCheckbox.checked = false;
+});
 
 // page load
 window.addEventListener('load', e => {
@@ -960,13 +973,18 @@ navbarMenu.addEventListener('click', (e) => {
 });
 
 // dark mode
-const themeCheckbox = document.querySelector('input[name=theme]');
+const trans = () => {
+    document.documentElement.classList.add('transition');
+    window.setTimeout(() => document.documentElement.classList.remove('transition'), 1000)
+}
 
-themeCheckbox.addEventListener('change', function (e) {
+const themeCheckbox = document.querySelector('input[name=themeCheckbox]');
+
+themeCheckbox.addEventListener('change', e => {
 
     let quireData = quireIO.getData();
 
-    if (this.checked) {
+    if (themeCheckbox.checked) {
         trans();
         document.documentElement.setAttribute('data-theme', 'dark');
         quireData.settings.theme = 'dark';
@@ -977,14 +995,7 @@ themeCheckbox.addEventListener('change', function (e) {
     }
 
     quireIO.updateData(quireData);
-})
-
-let trans = () => {
-    document.documentElement.classList.add('transition');
-    window.setTimeout(() => {
-        document.documentElement.classList.remove('transition')
-    }, 1000)
-}
+});
 
 // template
 const templateContent = document.querySelector('.templateContent');
