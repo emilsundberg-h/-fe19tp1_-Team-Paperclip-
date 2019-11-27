@@ -822,7 +822,7 @@ notesList.addEventListener('input', e => {
         })
 
         if (!tagSearchResultsArray.length) {
-            searchSuggestionsContainer.previousElementSibling.innerText = 'no tags found... press enter to add as a new tag';
+            searchSuggestionsContainer.previousElementSibling.innerText = 'no tags found... press enter to add';
         } else {
             searchSuggestionsContainer.previousElementSibling.innerText = 'pick from existing tags...';
         }

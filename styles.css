@@ -1,5 +1,6 @@
 :root {
   --primary-color: #89b4a2;
+  --primary-color-darker: #79a593;
   --primary-text-color: #333;
   --secondary-text-color: #808080; /* 30% lighter than primary text */
   --primary-background-color: #fff;
@@ -10,6 +11,8 @@
 }
 
 [data-theme='dark'] {
+  --primary-color: #161F28;
+  --primary-color-darker: #121a21;
   --primary-text-color: #fff;
   --secondary-text-color: #b3b3b3; /* 30% darker than primary text */
   --primary-background-color:  #222f3e;
@@ -31,11 +34,11 @@ body {
 }
 
 body {
-  font-family:  'Roboto', sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  font-family: 'Roboto', sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
   color: var(--primary-text-color);
   background-color: var(--primary-background-color);
   display: grid;
-  grid-template-columns: 80px 2fr 1fr 8fr 2fr;
+  grid-template-columns: 80px 2fr 1fr 8fr 1fr;
   grid-template-rows: var(--toolbar-height) calc(100% - var(--toolbar-height));
 }
 
@@ -49,7 +52,7 @@ body {
 
 .navbar-logo {
   width: 100%;
-  background-color: #79a593;
+  background-color: var(--primary-color-darker);
 }
 
 .navbar-logo svg {
@@ -70,9 +73,9 @@ body {
 .navbar-menu a {
   color: #fff;
   font-size: 30px;
-  padding: 10px;
+  padding: 14px;
   text-decoration: none;
-  margin: 15px;
+  /* margin: 15px; */
 }
 
 .navbar a:hover,
@@ -87,7 +90,13 @@ body {
   grid-row: 1 / 3;
   min-width: 230px;
   border-right: 0px var(--border-color) solid;
+  -webkit-box-shadow: 4px 0px 5px -3px rgba(0,0,0,0.20);
+  -moz-box-shadow: 0px 0px 20px -3px rgba(0,0,0,0.20);
+  box-shadow: 0px 0px 20px -3px rgba(0,0,0,0.20);
+}
 
+.menu::-webkit-scrollbar { 
+  display: none; 
 }
 
 .statistics-container {
@@ -100,19 +109,6 @@ body {
 
 .hide {
   display: none !important;
-}
-
-.menu-header {
-  background-color: var(--primary-color);
-  color: var(--primary-color);
-  height: var(--toolbar-height);
-  display: flex;
-  align-items: center;
-  padding-left: 8px;
-  border-bottom: 0px solid var(--border-color);
-}
-.menu::-webkit-scrollbar { 
-  display: none; 
 }
 
 .search-container {
@@ -143,7 +139,6 @@ body {
   width: 0;
   position: absolute;
   left: -9999px;
-
 }
 
 .starred-checkbox + label::after,
@@ -194,7 +189,7 @@ body {
 
 .note-toolbar {
   height: var(--toolbar-height);
-  background-color: #fff;
+  /* background-color: #fff; */
   grid-column: 4 / 5;
   grid-row: 1 / 2;
   margin-left: 0px;
@@ -242,12 +237,10 @@ body {
 
 .note-list-item {
   border-bottom: 1px solid var(--border-color);
-  padding: 8px 4px 8px 8px;
+  padding: 10px 12px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  padding-top: 10px;
-  padding-bottom: 10px;
 }
 
 .note-list-item:last-child {
@@ -314,7 +307,6 @@ padding-right: 3px;
   font-size: 11px;
   display: inline-block;
   color: var(--secondary-text-color);
-  margin-left: 5px;
 }
 
 .note-list-link {
@@ -323,15 +315,12 @@ padding-right: 3px;
 }
 
 .note-list-title {
-  font-size: 18px;
+  font-size: 20px;
   text-overflow: ellipsis; 
   overflow: hidden;
   white-space: nowrap;
   margin: 0;
-  padding-left: 5px;
-  padding-top: 6px;
-  padding-bottom: 6px;
-  padding-right: 5px;
+  padding: 6px 5px 6px 0px;
 }
 
 .note-list-preview {
@@ -339,7 +328,6 @@ padding-right: 3px;
   text-overflow: ellipsis; 
   overflow: hidden;
   color: var(--secondary-text-color);
-  margin-left: 5px;
 } 
 
 @media only screen and (max-width: 768px) {
@@ -373,6 +361,11 @@ padding-right: 3px;
     z-index: 2;
   }
 
+  .note-list-container,
+  .note-list {
+  height: 100%;
+}
+
   .show {
     display: block;
   }
@@ -390,10 +383,6 @@ padding-right: 3px;
   .delete-button,
   .tag-button {
     padding: 10px;
-  }
-
-  .note-list-container {
-    height: calc(100% - 60px);
   }
 
   .note-list {
@@ -547,9 +536,7 @@ transition-delay: 0 !important;
 
 .tag {
   display: inline-block;
-  margin: 4px;
-  margin-left: 5px;
-  margin-right: 5px;
+  margin: 4px 5px 4px 0px;
   border-radius: 4px;
   padding: 1px 6px;
   font-size: 12px;
@@ -588,6 +575,10 @@ transition-delay: 0 !important;
   border-bottom: 1px solid var(--primary-background-color);
 }
 
+.note-list-add-tag-container {
+  margin-left: 2px;
+}
+
 .tag-input::placeholder {
   color: var(--primary-text-color)
 }
@@ -606,8 +597,49 @@ transition-delay: 0 !important;
 .tag-delete-button:hover {
   opacity: 1;
 }
-.menu {
-  -webkit-box-shadow: 4px 0px 5px -3px rgba(0,0,0,0.20);
-  -moz-box-shadow: 0px 0px 20px -3px rgba(0,0,0,0.20);
-  box-shadow: 0px 0px 20px -3px rgba(0,0,0,0.20);
+
+.tag-search-suggestions {
+list-style: none;
+padding: 0px;
+background: var(--secondary-background-color);
+border-radius: 0px 0px 4px 4px;
+box-shadow: 2px 4px rgba(0,0,0,0.1);
+margin: 0px 8px 8px 8px;
+}
+
+.tag-search-text {
+display: block;
+font-size: 11px;
+color: var(--secondary-text-color);
+padding: 8px;
+}
+
+.tag-search-suggestion-item {
+border-bottom: 1px solid var(--border-color);
+padding: 4px 8px;
+}
+
+.tag-search-suggestion-item:hover,
+.tag-search-suggestion-item:focus {
+background-color: var(--hover-color);
+}
+
+
+/* tiny overrides */
+/* TODO: improve hover, lists etc in dark mode and consider borders */
+.tox,
+.tox-toolbar__primary,
+.tox-editor-header,
+.toolbar__group {
+  background: var(--primary-background-color) !important;
+  background-color: var(--primary-background-color) !important;
+  color: var(--primary-text-color) !important;
+  fill: var(--primary-text-color) !important;
+  border: none !important;
+}
+
+.tox-tbtn,
+.tox-tbtn svg {
+  color: var(--primary-text-color) !important;
+  fill: var(--primary-text-color) !important;
 }
