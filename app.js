@@ -656,11 +656,14 @@ notesList.addEventListener('click', e => {
             const confirmButton = notesList.querySelector(`#confirm-${noteId}`);
 
             confirmButton.classList.remove('hide');
+            confirmButton.classList.add('animated');
             trashcan.blur();
 
             confirmButton.addEventListener("click", e => {
 
                 confirmButton.classList.add('hide');
+                confirmButton.classList.remove('animated');
+
                 quireIO.deleteNote(noteId);
 
                 // in case user deletes the current note
@@ -684,6 +687,8 @@ notesList.addEventListener('click', e => {
 
             confirmButton.addEventListener('mouseleave', e => {
                 confirmButton.classList.add('hide');
+                confirmButton.classList.remove('animated');
+
             });
 
             // add tag button is pressed
