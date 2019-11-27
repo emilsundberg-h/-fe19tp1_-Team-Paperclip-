@@ -351,11 +351,11 @@ const getNoteDateRelative = date => {
 // parse note body
 const parseNoteBodyHTML = noteBody => {
     // Create a new div element
-    var temporalDivElement = document.createElement("div");
+    var temporalDivElement = document.createElement('div');
     // Set the HTML content with the providen
     temporalDivElement.innerHTML = noteBody;
     // Retrieve the text property of the element (cross-browser support)
-    return temporalDivElement.textContent || temporalDivElement.innerText || "";
+    return temporalDivElement.textContent || temporalDivElement.innerText || '';
 }
 
 // get note preview
@@ -438,14 +438,14 @@ const renderNotesList = () => {
 
     //reset search function
     document.querySelector('#starred-search').checked = false;
-    document.querySelector('#search').value = "";
+    document.querySelector('#search').value = '';
 
     let quireData = quireIO.getData();
 
-    let notesList = document.querySelector(".note-list");
+    let notesList = document.querySelector('.note-list');
 
     // clear notes list
-    notesList.innerHTML = "";
+    notesList.innerHTML = '';
 
     if (!quireData.notes.length) {
         notesList.innerHTML = '<div class="note-list-no-results"><i>No notes found... create one to get started!</></div>';
@@ -493,7 +493,10 @@ const renderNotesList = () => {
                         <div class="note-list-icons">
                             <button class="tag-button" title="Add tags"></button>
                             <button class= "delete-button" title="Delete note"></button>
-                            <button class= "confirm-button hide" id="confirm-${note.id}" title="Confirm delete">Click to delete</button>
+                            <div class="confirm-div hide" id="confirm-${note.id}">
+                            <button class="confirm-buttons confirm" title="Confirm delete">Delete</button>
+                            <button class="confirm-buttons cancel" title="Cancel delete">Cancel</button>
+                            </div>
                             <input type="checkbox" name="star-${note.id}" id="star-${note.id}" class="starred-checkbox" ${note.starred ? "checked" : ""}>
                             <label for="star-${note.id}" title="${note.starred ? 'Unstar note' : 'Star note'}"></label>
                         </div>
@@ -570,12 +573,12 @@ const updateNoteInNotesList = noteId => {
     let currentNote = quireIO.getData().currentNote;
 
     if (currentNote === note.id) {
-        let checkClass = document.querySelectorAll(".note-list-item")
+        let checkClass = document.querySelectorAll('.note-list-item')
 
         //Check if selected note is visible
         checkClass.forEach(function (e) {
 
-            if (e.classList.contains("note-list-item-current")) {
+            if (e.classList.contains('note-list-item-current')) {
 
                 let currentNoteItem = document.querySelector('.note-list-item-current');
                 currentNoteItem.classList.remove('note-list-item-current');
@@ -646,50 +649,55 @@ notesList.addEventListener('click', e => {
 
 
             // delete note if trash can is pressed
-        } else if (e.target.classList.contains("delete-button")) {
+        } else if (e.target.classList.contains('delete-button')) {
 
             let quireData = quireIO.getData();
 
             const trashcan = e.target
 
             //Confirm delete
-            const confirmButton = notesList.querySelector(`#confirm-${noteId}`);
+            const confirmButtons = notesList.querySelector(`#confirm-${noteId}`);
 
-            confirmButton.classList.remove('hide');
-            confirmButton.classList.add('animated');
+            const mouseOut = (e) => {
+                confirmButtons.classList.add('hide');
+                confirmButtons.classList.remove('animated');
+            };
+            confirmButtons.addEventListener('mouseleave', mouseOut)
+
+            confirmButtons.classList.remove('hide');
+            confirmButtons.classList.add('animated');
             trashcan.blur();
 
-            confirmButton.addEventListener("click", e => {
+            confirmButtons.addEventListener('click', e => {
+                confirmButtons.removeEventListener('mouseout', mouseOut)
 
-                confirmButton.classList.add('hide');
-                confirmButton.classList.remove('animated');
+                if (e.target.classList.contains('confirm')) {
+                    confirmButtons.classList.add('hide');
+                    confirmButtons.classList.remove('animated');
+                    quireIO.deleteNote(noteId);
 
-                quireIO.deleteNote(noteId);
+                    // in case user deletes the current note
+                    if (noteId == quireData.currentNote) {
 
-                // in case user deletes the current note
-                if (noteId == quireData.currentNote) {
-
-                    // clear the editor
-                    tinyMCE.activeEditor.setContent('');
-                }
+                        // clear the editor
+                        tinyMCE.activeEditor.setContent('');
+                    }
 
 
-                //Check if notelist is in search mode
-                if (document.querySelector('#search').value == "" && !searchStarred.checked) {
-                    renderNotesList();
+                    //Check if notelist is in search mode
+                    if (document.querySelector('#search').value == '' && !searchStarred.checked) {
+                        renderNotesList();
+                    } else {
+                        let searchStar = false;
+                        let searchString = document.querySelector('#search').value;
+                        if (searchStarred.checked) searchStar = true;
+                        searchNotesList(searchString, searchStar);
+                    }
                 } else {
-                    let searchStar = false;
-                    let searchString = document.querySelector('#search').value;
-                    if (searchStarred.checked) searchStar = true;
-                    searchNotesList(searchString, searchStar);
+                    confirmButtons.classList.add('hide');
+                    confirmButtons.classList.remove('animated');
                 }
             })
-
-            confirmButton.addEventListener('mouseleave', e => {
-                confirmButton.classList.add('hide');
-                confirmButton.classList.remove('animated');
-
-            });
 
             // add tag button is pressed
         } else if (e.target.classList.contains('tag-button')) {
@@ -880,7 +888,7 @@ navbarMenu.addEventListener('click', (e) => {
             document.querySelector('.statistics-container').classList.add('hide');
 
             // change menu title
-            document.querySelector("#menu-title").innerText = "Browse notes";
+            // document.querySelector('#menu-title').innerText = 'Browse notes';
 
             break
         }
@@ -902,7 +910,7 @@ navbarMenu.addEventListener('click', (e) => {
             document.querySelector('.statistics-container').classList.add('hide');
 
             // change menu title
-            document.querySelector("#menu-title").innerText = "Browse notes";
+            // document.querySelector('#menu-title').innerText = 'Browse notes';
 
             // render notes list
             renderNotesList();
@@ -927,7 +935,7 @@ navbarMenu.addEventListener('click', (e) => {
             document.querySelector('.note-list-container').classList.add('hide');
 
             // change menu title
-            document.querySelector("#menu-title").innerText = "Statistics";
+            // document.querySelector('#menu-title').innerText = 'Statistics';
 
             break
         }
@@ -949,7 +957,7 @@ navbarMenu.addEventListener('click', (e) => {
             document.querySelector('.note-list-container').classList.add('hide');
 
             // change menu title
-            document.querySelector("#menu-title").innerText = "Settings";
+            // document.querySelector("#menu-title").innerText = "Settings";
 
             break
         }
@@ -1060,16 +1068,16 @@ templateContent.addEventListener('click', (e) => {
 const searchInput = document.querySelector('#search');
 const searchStarred = document.querySelector('#starred-search');
 
-searchInput.addEventListener('search', function () {
+searchInput.addEventListener('search', () => {
     if (searchStarred.checked || !searchInput.value == '') {
-        searchString = searchInput.value
+        searchString = searchInput.value;
         searchNotesList(searchString, searchStarred.checked);
     } else {
         renderNotesList();
     }
 })
 
-searchInput.addEventListener('keyup', function (string) {
+searchInput.addEventListener('keyup', (string) => {
 
     let searchString = '';
     let searchStar = searchStarred.checked;
@@ -1079,7 +1087,7 @@ searchInput.addEventListener('keyup', function (string) {
     searchNotesList(searchString, searchStar);
 })
 
-searchStarred.addEventListener('click', function (e) {
+searchStarred.addEventListener('click', (e) => {
 
     let searchString = searchInput.value;
     let searchStar = searchStarred.checked;
@@ -1091,10 +1099,10 @@ const checkSearchWords = (searchIn, arrSearchString) => {
 
     let result = true
     arrSearchString.forEach((searchWord, i) => {
-        if (searchWord === arrSearchString[i + 1] && i < arrSearchString.length) searchWord += ' ' + arrSearchString[i + 1]
+        if (searchWord === arrSearchString[i + 1] && i < arrSearchString.length) searchWord += ' ' + arrSearchString[i + 1];
         if (!searchIn.toLowerCase().includes(searchWord.trim())) result = false;
     })
-    return result
+    return result;
 }
 
 const searchNotesList = (searchString = '', searchStar = false) => {
@@ -1110,7 +1118,7 @@ const searchNotesList = (searchString = '', searchStar = false) => {
     if (searchString.includes(' ')) {
         arrSearchString.push(...searchString.trim().toLowerCase().split(' '));
     } else {
-        arrSearchString.push(searchString.trim().toLowerCase())
+        arrSearchString.push(searchString.trim().toLowerCase());
     }
 
     quireData.notes.forEach(note => {
@@ -1159,7 +1167,10 @@ const searchNotesList = (searchString = '', searchStar = false) => {
                         <div class="note-list-icons">
                             <button class="tag-button" title="Add tags"></button>
                             <button class= "delete-button" title="Delete note"></button>
-                            <button class= "confirm-button hide" id="confirm-${note.id}" title="Confirm delete">Click to delete</button>
+                            <div class="confirm-div hide" id="confirm-${note.id}">
+                            <button class="confirm-buttons confirm" title="Confirm delete">Delete</button>
+                            <button class="confirm-buttons cancel" title="Cancel delete">Cancel</button>
+                            </div>
                             <input type="checkbox" name="star-${note.id}" id="star-${note.id}" class="starred-checkbox" ${note.starred ? "checked" : ""}>
                             <label for="star-${note.id}" title="${note.starred ? 'Unstar note' : 'Star note'}"></label>
                         </div>
