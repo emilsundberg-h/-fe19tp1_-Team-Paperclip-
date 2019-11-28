@@ -80,12 +80,12 @@ const quireIO = (function () {
 
                 // create quire data object
                 let quireData = {
-                        notes: [],
-                        currentNote: null,
-                        templates: [],
-                        tags: [],
-                        settings: { theme }
-                    };
+                    notes: [],
+                    currentNote: null,
+                    templates: [],
+                    tags: [],
+                    settings: { theme }
+                };
 
                 localStorage.setItem('quireData', JSON.stringify(quireData));
                 localStorage.getItem('quireData')
@@ -845,7 +845,6 @@ notesList.addEventListener('input', e => {
 // hide tag suggestions container when notes list is no longer in focus
 // TODO: maybe exessive, consider cleaner solution?
 document.addEventListener('focusin', e => {
-
     let addTagContainers = notesList.querySelectorAll('.note-list-add-tag-container');
 
     if (!e.target.closest('.note-list')) {
@@ -856,6 +855,42 @@ document.addEventListener('focusin', e => {
 
     }
 });
+
+//Q
+
+const logoQDiv = document.querySelector('.navbar-logo')
+
+const getDadJoke = async () => {
+    const response = await fetch('https://icanhazdadjoke.com', { headers: { 'Accept': 'application/json' } });
+    const myJson = await response.json();
+    console.log(JSON.stringify(myJson));
+
+    document.querySelector('#scroll').style.display = 'flex'
+    document.querySelector('#scroll').innerHTML = `<marquee behavior="scroll" direction="left" scrollamount="8">${JSON.stringify(myJson.joke)}</marquee>`;
+}
+
+logoQDiv.addEventListener("click", (e) => {
+
+    let logoQ = document.querySelector('#logoQ')
+
+    logoQ.classList.toggle('rotated')
+
+    getDadJoke();
+
+    const unrotate = () => {
+        document.querySelector('#scroll').removeEventListener("mouseleave", unrotate)
+        logoQ.classList.toggle('rotated');
+        document.querySelector('#scroll').innerHTML = ""
+        document.querySelector('#scroll').style.display = 'none'
+    }
+
+    document.querySelector('#scroll').addEventListener("mouseleave", unrotate)
+
+    // console.log(dadJoke)
+
+
+})
+
 
 // navbar
 const navbarMenu = document.querySelector('#navbar-menu');

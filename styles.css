@@ -60,8 +60,25 @@ body {
   margin: auto;
   padding: 10px 0;
   fill: #fff;
+  transition-duration: 0.5s;
 }
-
+.rotated{
+  transform: rotateY(90deg);
+  transition-duration: 0.5s;
+}
+/* .unrotated{
+  transform: rotateY(0deg);
+  transition-duration: 1s;
+} */
+.scroll{
+  position: absolute;
+  width:80px;
+  height:80px;
+  font-size: 16px;
+  color: #fff;
+  display: none;
+  align-items: center;
+}
 .navbar-menu {
   display: inline-flex;
   flex-flow: column;
