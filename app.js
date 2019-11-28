@@ -892,9 +892,6 @@ navbarMenu.addEventListener('click', (e) => {
             document.querySelector('.settings-container').classList.add('hide');
             document.querySelector('.statistics-container').classList.add('hide');
 
-            // change menu title
-            // document.querySelector('#menu-title').innerText = 'Browse notes';
-
             break
         }
 
@@ -913,9 +910,6 @@ navbarMenu.addEventListener('click', (e) => {
             // hide other submenus
             document.querySelector('.settings-container').classList.add('hide');
             document.querySelector('.statistics-container').classList.add('hide');
-
-            // change menu title
-            // document.querySelector('#menu-title').innerText = 'Browse notes';
 
             // render notes list
             renderNotesList();
@@ -939,8 +933,18 @@ navbarMenu.addEventListener('click', (e) => {
             document.querySelector('.settings-container').classList.add('hide');
             document.querySelector('.note-list-container').classList.add('hide');
 
-            // change menu title
-            // document.querySelector('#menu-title').innerText = 'Statistics';
+            // TODO: implement statistcs
+
+            // Display a dad joke during the meantime
+            const getDadJoke = async () => {
+                const response = await fetch('https://icanhazdadjoke.com', { headers: { 'Accept': 'application/json' } });
+                const myJson = await response.json();
+                console.log(JSON.stringify(myJson));
+
+                document.querySelector('#dad-joke').textContent = JSON.stringify(myJson.joke);
+            }
+
+            getDadJoke();
 
             break
         }
@@ -960,9 +964,6 @@ navbarMenu.addEventListener('click', (e) => {
             // hide other submenus
             document.querySelector('.statistics-container').classList.add('hide');
             document.querySelector('.note-list-container').classList.add('hide');
-
-            // change menu title
-            // document.querySelector("#menu-title").innerText = "Settings";
 
             break
         }
