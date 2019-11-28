@@ -4,7 +4,7 @@
 
 tinymce.init({
     selector: '#note-body',
-    toolbar: 'bold italic strikethrough underline h2 h3 | bullist numlist aligncenter blockquote | image link print wordcount | Template emoticons | fontselect|',
+    toolbar: 'bold italic strikethrough underline h2 h3 | bullist | numlist | aligncenter | blockquote | image | link | print | wordcount | Template | emoticons | fontselect|',
     fixed_toolbar_container: '#note-toolbar',
     aligncenter: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'center' },
     toolbar_drawer: 'sliding',
@@ -13,8 +13,7 @@ tinymce.init({
     inline: true,
     contextmenu: false,
     skin: 'oxide',
-    plugins: 'lists image code link print textpattern wordcount fontsizeselect emoticons',
-    fontsize_formats: '11px 12px 14px 16px 18px 24px 36px 48px',
+    plugins: 'lists image code link print textpattern wordcount emoticons',
     content_css: ['https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans|Oswald|Raleway|Roboto&display=swap'],
     font_formats: 'Arial=arial;Baskervville=Baskervville, serif;Helvetica=helvetica,sans-serif;Courier=courier new,courier,monospace;Montserrat=Montserrat,sans-serif;Roboto=Roboto, sans-serif;Oswald=Oswald, sans-serif;Raleway=Raleway, sans-serif;',
     setup: (editor) => {

@@ -718,6 +718,11 @@ background-color: var(--hover-color);
 
 /* tiny overrides */
 /* TODO: improve hover, lists etc in dark mode and consider borders */
+.tox:not([dir=rtl]),
+.tox-toolbar__group:not(:last-of-type) {
+  border-right: none !important;
+}
+
 .tox,
 .tox-toolbar__primary,
 .tox-editor-header,
