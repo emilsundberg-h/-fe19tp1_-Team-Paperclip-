@@ -4,33 +4,30 @@
 
 tinymce.init({
     selector: '#note-body',
-    toolbar: 'bold italic strikethrough underline h2 h3 | bullist numlist blockquote image link print wordcount | fontselect Template |',
+    toolbar: 'bold italic strikethrough underline h2 h3 | bullist numlist aligncenter blockquote | image link print wordcount | Template emoticons | fontselect|',
     fixed_toolbar_container: '#note-toolbar',
+    aligncenter: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'center' },
     toolbar_drawer: 'sliding',
     menubar: false,
     branding: false,
     inline: true,
     contextmenu: false,
     skin: 'oxide',
-    plugins: 'lists image code link print textpattern wordcount fontsizeselect',
+    plugins: 'lists image code link print textpattern wordcount fontsizeselect emoticons',
     fontsize_formats: '11px 12px 14px 16px 18px 24px 36px 48px',
     content_css: ['https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans|Oswald|Raleway|Roboto&display=swap'],
     font_formats: 'Arial=arial,Baskervville=Baskervville, serif;helvetica,sans-serif;Courier New=courier new,courier,monospace;Montserrat=Montserrat,sans-serif;Roboto=Roboto, sans-serif;Oswald=Oswald, sans-serif;Raleway=Raleway, sans-serif;',
-
     setup: (editor) => {
         editor.ui.registry.addButton('Template', {
-            icon: 'template.svg',
+            icon: 'template',
             tooltip: 'Choose Template',
             id: 'template-buttton',
             stateSelector: 'test-clas',
             onAction: () => {
                 document.querySelector('.bg-modal').style.display = 'flex';
-
                 document.querySelector('.close').addEventListener('click', function () {
                     document.querySelector('.bg-modal').style.display = 'none';
                 });
-
-
             }
         });
     },
@@ -44,24 +41,20 @@ tinymce.init({
         var input = document.createElement('input');
         input.setAttribute('type', 'file');
         input.setAttribute('accept', 'image/*');
-
         input.onchange = function () {
             var file = this.files[0];
             var reader = new FileReader();
-
             reader.onload = function () {
                 var id = 'blobid' + (new Date()).getTime();
                 var blobCache = tinymce.activeEditor.editorUpload.blobCache;
                 var base64 = reader.result.split(',')[1];
                 var blobInfo = blobCache.create(id, file, base64);
                 blobCache.add(blobInfo);
-
                 // call the callback and populate the Title field with the file name
                 cb(blobInfo.blobUri(), { title: file.name });
             };
             reader.readAsDataURL(file);
         };
-
         input.click();
     }
 });
