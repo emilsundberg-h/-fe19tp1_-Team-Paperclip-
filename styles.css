@@ -112,7 +112,7 @@ body {
 }
 
 .search-container {
-  padding: 0px 4px 0px 8px;
+  padding: 0px 12px 0px 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -207,6 +207,33 @@ body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+/* .note-content */
+/* h1 {
+  font-size: 1.8em;
+}
+h2 {
+  font-size: 1.6em;
+}
+h3 {
+  font-size: 1.4em;
+}
+p {
+  font-size: 18px;
+}
+li {
+  font-size: 18px;
+}
+blockquote {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 40px;
+  margin-right: 120px;
+  font-style: italic;
+} */
+
+
 .note-content::-webkit-scrollbar { 
   display: none; 
 }
@@ -224,7 +251,7 @@ body {
 
 .note-list-container,
 .note-list {
-  height: calc(100% - 40px);
+  height: calc(100% - 20px);
 }
 
 .note-list {
@@ -340,12 +367,18 @@ padding-right: 3px;
 
 .confirm{
   border-radius: 4px 0px 0px 4px;
-  background-color: green;
+  background-color: rgb(103, 148, 103);
+}
+.confirm:hover{
+  background-color: rgb(73, 118, 73);
 }
 
 .cancel{
   border-radius: 0px 4px 4px 0px;
-  background-color: red;
+  background-color: rgb(248, 108, 108);
+}
+.cancel:hover{
+  background-color: rgb(218,78,78);
 }
 .animated{
     animation: appear 0.1s;
