@@ -757,3 +757,10 @@ div[role=application]{
   color: var(--primary-text-color) !important;
   fill: var(--primary-text-color) !important;
 }
+
+.dad-joke {
+  margin: 0;
+  border-left: 1px solid var(--secondary-text-color);
+  padding-left: 10px;
+  color: var(--secondary-text-color);
+}
