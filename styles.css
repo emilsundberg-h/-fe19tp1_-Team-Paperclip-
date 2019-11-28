@@ -211,38 +211,49 @@ body {
 .note-content::-webkit-scrollbar { 
   display: none; 
 }
-.note-content img{
-  max-width: 100%;
-  height: auto;
-}
+
 
 .note-body  {
   height: 100%;
   outline: none;
 }
 
-.notebody h1 {
+.note-body h1 {
   font-size: 1.8em;
 }
-.notebody h2 {
+
+.note-body h1:first-child {
+  margin-top: 10px;
+}
+
+.note-body h2 {
   font-size: 1.6em;
 }
-.notebody h3 {
+
+.note-body h3 {
   font-size: 1.4em;
 }
-.notebody p {
+
+.note-body p {
   font-size: 18px;
 }
-.notebody li {
+
+.note-body li {
   font-size: 18px;
 }
-.notebody blockquote {
+
+.note-body blockquote {
   display: block;
   margin-top: 1em;
   margin-bottom: 1em;
   margin-left: 40px;
   margin-right: 120px;
   font-style: italic;
+}
+
+.note-body img{
+  max-width: 100%;
+  height: auto;
 }
 
 .note-list-no-results {
