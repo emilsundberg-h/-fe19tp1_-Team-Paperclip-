@@ -208,32 +208,6 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* .note-content */
-/* h1 {
-  font-size: 1.8em;
-}
-h2 {
-  font-size: 1.6em;
-}
-h3 {
-  font-size: 1.4em;
-}
-p {
-  font-size: 18px;
-}
-li {
-  font-size: 18px;
-}
-blockquote {
-  display: block;
-  margin-top: 1em;
-  margin-bottom: 1em;
-  margin-left: 40px;
-  margin-right: 120px;
-  font-style: italic;
-} */
-
-
 .note-content::-webkit-scrollbar { 
   display: none; 
 }
@@ -241,6 +215,30 @@ blockquote {
 .note-body  {
   height: 100%;
   outline: none;
+}
+
+.notebody h1 {
+  font-size: 1.8em;
+}
+.notebody h2 {
+  font-size: 1.6em;
+}
+.notebody h3 {
+  font-size: 1.4em;
+}
+.notebody p {
+  font-size: 18px;
+}
+.notebody li {
+  font-size: 18px;
+}
+.notebody blockquote {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 40px;
+  margin-right: 120px;
+  font-style: italic;
 }
 
 .note-list-no-results {
@@ -264,11 +262,10 @@ blockquote {
 }
 
 ::-webkit-scrollbar {
-  height: 14px;
-  width: 14px;
-  height: 14px;
+  height: 5px;
+  width: 5px;
   overflow: visible;
-  width: 14px;
+  color: #fff;
 }
 
 ::-webkit-scrollbar-button {
@@ -279,13 +276,12 @@ blockquote {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: #dadce0;
+  background-color: rgb(200, 200, 200);
   border-color: transparent;
   border-radius: 8px;
   border-style: solid;
   border-width: 4px;
   box-shadow: none;
-  background-color: rgba(0,0,0,.2);
   background-clip: padding-box;
   border: solid transparent;
   border-width: 1px 1px 1px 6px;
@@ -294,7 +290,7 @@ blockquote {
   box-shadow: inset 1px 1px 0 rgba(0,0,0,.1), inset 0 -1px 0 rgba(0,0,0,.07);
 }
 ::-webkit-scrollbar-track, ::-webkit-scrollbar-thumb, ::-webkit-scrollbar-track-piece {
-  border-width: 4px!important;
+  border-width: 0px!important;
 }
 
 ::-webkit-scrollbar-track {
@@ -367,18 +363,18 @@ padding-right: 3px;
 
 .confirm{
   border-radius: 4px 0px 0px 4px;
-  background-color: rgb(103, 148, 103);
+  background-color: rgb(224, 75, 75);
 }
 .confirm:hover{
-  background-color: rgb(73, 118, 73);
+  background-color: rgb(184, 35, 35);
 }
 
 .cancel{
   border-radius: 0px 4px 4px 0px;
-  background-color: rgb(248, 108, 108);
+  background-color: rgb(142, 142, 142);
 }
 .cancel:hover{
-  background-color: rgb(218,78,78);
+  background-color: rgb(102,102,102);
 }
 .animated{
     animation: appear 0.1s;
