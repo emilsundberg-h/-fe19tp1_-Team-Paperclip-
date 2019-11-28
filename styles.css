@@ -211,6 +211,10 @@ body {
 .note-content::-webkit-scrollbar { 
   display: none; 
 }
+.note-content img{
+  max-width: 100%;
+  height: auto;
+}
 
 .note-body  {
   height: 100%;
