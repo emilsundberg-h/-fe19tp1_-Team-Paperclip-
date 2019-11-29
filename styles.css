@@ -54,6 +54,10 @@ body {
   width: 100%;
   background-color: var(--primary-color-darker);
 }
+.navbar-logo a:hover {
+  cursor: grab;
+}
+
 
 .navbar-logo svg {
   display: block;
@@ -61,24 +65,36 @@ body {
   padding: 10px 0;
   fill: #fff;
   transition-duration: 0.5s;
+  position: relative;
 }
 .rotated{
   transform: rotateY(90deg);
   transition-duration: 0.5s;
 }
-/* .unrotated{
-  transform: rotateY(0deg);
-  transition-duration: 1s;
-} */
+
+.scroll p {
+    padding-left: 100%;
+    animation: marquee 5s linear infinite;
+}
+
+@keyframes marquee {
+    0%   { transform: translate(0, 0); }
+    100% { transform: translate(-100%, 0); }
+}
+
 .scroll{
+  display: none;  
   position: absolute;
-  width:80px;
-  height:80px;
+  width: 80px;
+  height: 80px;
   font-size: 16px;
   color: #fff;
-  display: none;
   align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  box-sizing: border-box;
 }
+
 .navbar-menu {
   display: inline-flex;
   flex-flow: column;
@@ -294,23 +310,25 @@ body {
 }
 
 .note-list::-webkit-scrollbar {
-  height: 5px;
-  width: 5px;
-  overflow: visible;
-  color: #fff;
+  height: 6px;
+  width: 6px;
+    background: none;
+  /* overflow: auto; */
+  /* color: #fff; */
 }
 
-.note-list::-webkit-scrollbar-button {
+/* .note-list::-webkit-scrollbar-button {
   height: 0;
   width: 0;
-}
-.note-list::-webkit-scrollbar-corner {
+} */
+/* .note-list::-webkit-scrollbar-corner {
   background: transparent;
-}
+} */
+
 .note-list::-webkit-scrollbar-thumb {
-  background-color: rgb(200, 200, 200);
-  border-color: transparent;
-  border-radius: 8px;
+  background-color: rgba(72, 72, 72,0.2);
+  border-radius: 4px;
+  /* border-color: transparent;
   border-style: solid;
   border-width: 4px;
   box-shadow: none;
@@ -319,19 +337,24 @@ body {
   border-width: 1px 1px 1px 6px;
   min-height: 28px;
   padding: 100px 0 0;
-  box-shadow: inset 1px 1px 0 rgba(0,0,0,.1), inset 0 -1px 0 rgba(0,0,0,.07);
-}
-.note-list::-webkit-scrollbar-track, ::-webkit-scrollbar-thumb, ::-webkit-scrollbar-track-piece {
-  border-width: 0px!important;
+  box-shadow: inset 1px 1px 0 rgba(0,0,0,.1), inset 0 -1px 0 rgba(0,0,0,.07); */
 }
 
-.note-list::-webkit-scrollbar-track-piece {
+
+/* .note-list::-webkit-scrollbar-track, ::-webkit-scrollbar-thumb{ 
+  ::-webkit-scrollbar-track-piece { 
+  border-width: 0px!important; 
+}*/
+
+/* .note-list::-webkit-scrollbar-track-piece { 
+  display: none;
   box-shadow: none;
   margin: 0 4px;
   background-clip: padding-box;
   border: solid transparent;
   border-width: 0 0 0 4px;
-}
+  background-color:transparent; 
+}*/
 
 .note-list-item {
   border-bottom: 1px solid var(--border-color);
