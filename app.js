@@ -72,13 +72,15 @@ const quireIO = (function () {
                 console.log('yay! found quire object');
             } else {
 
-                // check preferred system theme
+                // check system for preferred theme
                 let theme = 'light';
+
                 if (window.matchMedia('(prefers-color-scheme)').media !== 'not all') {
-                    window.matchMedia("(prefers-color-scheme: dark)").matches ? theme = 'dark' : theme = 'light';
+
+                    if (window.matchMedia("(prefers-color-scheme: dark)").matches) theme = 'dark';
                 }
 
-                // create quire data object
+                // create quire object
                 let quireData = {
                     notes: [],
                     currentNote: null,
@@ -87,6 +89,7 @@ const quireIO = (function () {
                     settings: { theme }
                 };
 
+                // write quire object to local storage
                 localStorage.setItem('quireData', JSON.stringify(quireData));
                 localStorage.getItem('quireData')
                     ? console.log('hiya! quire object created')
