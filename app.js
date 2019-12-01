@@ -857,17 +857,19 @@ document.addEventListener('focusin', e => {
 });
 
 //Q
-const logoQDiv = document.querySelector('.navbar-logo')
+const logoQDiv = document.querySelector('.navbar-logo');
 
 const getDadJoke = async () => {
+
+    let scrollJoke = document.querySelector('#scroll');
 
     //Get the joke from API
     const response = await fetch('https://icanhazdadjoke.com', { headers: { 'Accept': 'application/json' } });
     const myJson = await response.json();
 
     //Show the joke in DOM
-    document.querySelector('#scroll').style.display = 'flex'
-    document.querySelector('#scroll').innerHTML = `<p>${JSON.stringify(myJson.joke)}</p>`;
+    scrollJoke.style.display = 'flex';
+    scrollJoke.innerHTML = `<p>${JSON.stringify(myJson.joke)}</p>`;
 
     //Calculate scroll speed based on joke length
     let scrollSpeed = Math.round(JSON.stringify(myJson.joke).length / 5);
@@ -877,28 +879,29 @@ const getDadJoke = async () => {
 
 logoQDiv.addEventListener("click", (e) => {
 
-    let logoQ = document.querySelector('#logoQ')
-    let scrollMessage = document.querySelector('#scroll')
+    let logoQ = document.querySelector('#logoQ');
+    let scrollJoke = document.querySelector('#scroll');
 
     //Rotate Q
-    logoQ.classList.toggle('rotated')
-
-    //Get and scroll the joke
-    getDadJoke();
+    logoQ.classList.toggle('rotated');
 
     const unrotate = () => {
-        scrollMessage.removeEventListener("mouseleave", unrotate);
+
+        scrollJoke.removeEventListener('mouseleave', unrotate);
 
         //Unrotate Q
         logoQ.classList.toggle('rotated');
 
         //Reset scroll message
-        scrollMessage.innerHTML = "";
-        scrollMessage.style.display = 'none';
+        scrollJoke.innerHTML = '';
+        scrollJoke.style.display = 'none';
     }
 
     //Listen if user leaves the Q 
-    scrollMessage.addEventListener("mouseleave", unrotate);
+    scrollJoke.addEventListener('mouseleave', unrotate);
+
+    //Get and scroll the joke
+    getDadJoke();
 })
 
 
