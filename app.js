@@ -72,15 +72,13 @@ const quireIO = (function () {
                 console.log('yay! found quire object');
             } else {
 
-                // check system for preferred theme
+                // check preferred system theme
                 let theme = 'light';
-
                 if (window.matchMedia('(prefers-color-scheme)').media !== 'not all') {
-
-                    if (window.matchMedia("(prefers-color-scheme: dark)").matches) theme = 'dark';
+                    window.matchMedia("(prefers-color-scheme: dark)").matches ? theme = 'dark' : theme = 'light';
                 }
 
-                // create quire object
+                // create quire data object
                 let quireData = {
                     notes: [],
                     currentNote: null,
@@ -89,7 +87,6 @@ const quireIO = (function () {
                     settings: { theme }
                 };
 
-                // write quire object to local storage
                 localStorage.setItem('quireData', JSON.stringify(quireData));
                 localStorage.getItem('quireData')
                     ? console.log('hiya! quire object created')
@@ -873,7 +870,7 @@ const getDadJoke = async () => {
     document.querySelector('#scroll').innerHTML = `<p>${JSON.stringify(myJson.joke)}</p>`;
 
     //Calculate scroll speed based on joke length
-    let scrollSpeed = Math.round(JSON.stringify(myJson.joke).length / 10);
+    let scrollSpeed = Math.round(JSON.stringify(myJson.joke).length / 5);
     document.querySelector('.scroll > p').style.animation =
         `marquee ${(scrollSpeed > 7) ? scrollSpeed - 1 : scrollSpeed}s linear infinite`;
 }
@@ -1056,7 +1053,7 @@ templateContent.addEventListener('click', (e) => {
     if (pressedElement === 'temp1') {
 
         // then we create the new note (which returns its id)
-        let newNoteId = quireIO.createNote('<h1>Välkommen till din anteckningsbok Quire!</h1><p></p><br></p><blockquote><p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img src="quire_notebook.jpg" alt="" width="362" height="362"></p></blockquote><p><br></p><p>Så kul att du hittat hit. Vi hoppas att Quire från och med nu kommer vara plattformen för alla dina anteckningar. Låt oss öka chanserna för detta genom att berätta om några funktioner.</p><p><br></p><p><strong>Autospara</strong></p><p>Allting sparas automatiskt så du behöver aldrig vara orolig över att någonting försvinner.&nbsp;</p><p><br></p><p><strong>Sök</strong></p><p>Du söker genom hela innehållet och inte bara titlar. Vill du bara söka på dina stjärnmarkerade inlägg, klicka på stjärnan i sökfunktionen.</p><p><br></p><p><strong>Dark mode</strong></p><p>Visst är det så att när man ligger där i sängen och vrider på sig, det är då man kommer på de allra smartaste sakerna och tecknar man inte ned dem som är det börtglömt till morgonen. Var snäll mot dig själv och dina ögon genom att slå på dark mode när du skriver ned dina saker på småtimmarna. Du hittar dark mode under inställningar i vänsterkollumnen.</p><p><br></p><p><strong>Stjärnmarkering</strong></p><p>Välj ut dina speciella anteckningar genom att klicka i stjärnan. För att visa alla stjärnmarkeringar klickar du bara på stjärnan bredvid sökfältet.</p><p><br></p><p><strong>Mallar</strong></p><p>Behöver du ett snyggt CV eller en att-göra-lista? Längst upp till höger i verktygslistan finns det färdiga mallar för ändåmålet. Om du vill komma åt den här anteckningen igen, så hittar du den i mallar.</p><p><br></p><p><strong>Utskrift</strong></p><p>Digitala anteckningar i all ära, men beöhver du skriva ut dina anteckningar behöver du inte vara orolig över att något annat än just den valda anteckningen skrivs ut.</p><p><br></p>');
+        let newNoteId = quireIO.createNote(`h1 style="text-align: center;" data-mce-style="text-align: center;">Välkommen till din anteckningsbok Quire!</h1><p><br data-mce-bogus="1"></p><p style="text-align: center;" data-mce-style="text-align: center;"><img src="quire_notebook.jpg" alt="" width="308" height="308" data-mce-src="quire_notebook.jpg" style="background-color: var(--primary-background-color); color: var(--primary-text-color); font-family: Roboto, sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';" data-mce-style="background-color: var(--primary-background-color); color: var(--primary-text-color); font-family: Roboto, sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';"><br></p><p><br></p><p>Så kul att du hittat hit. Vi hoppas att Quire från och med nu kommer vara plattformen för alla dina anteckningar. Låt oss öka chanserna för detta genom att berätta om några funktioner.</p><p><br></p><p><strong>Autospara</strong></p><p>Allting sparas automatiskt så du behöver aldrig vara orolig över att någonting försvinner.&nbsp;</p><p><br></p><p><strong>Sök</strong></p><p>Du söker genom hela innehållet och inte bara titlar. Vill du bara söka på dina stjärnmarkerade inlägg, klicka på stjärnan i sökfunktionen.</p><p><br data-mce-bogus="1"></p><p><strong>Stjärnmarkering</strong></p><p>Välj ut dina speciella anteckningar genom att klicka i stjärnan. För att visa alla stjärnmarkeringar klickar du bara på stjärnan bredvid sökfältet.</p><p><br data-mce-bogus="1"></p><p><strong>Taggar</strong></p><p>Organisera dina anteckningar med hjälp av taggar. När du skapar en ny tagg kommer förslag på dina tidigare använda taggar.&nbsp;</p><p><br></p><p><strong>Dark mode</strong></p><p>Visst är det så att när man ligger där i sängen och vrider på sig, det är då man kommer på de allra smartaste sakerna och tecknar man inte ned dem, så är det bortglömt till morgonen. Var snäll mot dig själv och dina ögon genom att slå på dark mode när du skriver ned dina saker på småtimmarna. Du hittar dark mode under inställningar i vänsterkolumnen.</p><p><br></p><p><strong>Utskrift</strong></p><p>Digitala anteckningar i all ära, men behöver du skriva ut dina anteckningar behöver du inte vara orolig över att något annat än just den valda anteckningen skrivs ut.</p><p><br></p>`);
 
         // followed by rendering the new note
         renderNote(newNoteId);
