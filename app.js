@@ -13,7 +13,7 @@ tinymce.init({
     inline: true,
     contextmenu: false,
     skin: 'oxide',
-    plugins: 'lists image code link print textpattern wordcount emoticons fontsizeselect',
+    plugins: 'lists image code link print textpattern wordcount emoticons',
     content_css: ['https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans|Oswald|Raleway|Roboto&display=swap'],
     font_formats: 'Arial=arial;Baskervville=Baskervville, serif;Helvetica=helvetica,sans-serif;Courier=courier new,courier,monospace;Montserrat=Montserrat,sans-serif;Roboto=Roboto, sans-serif;Oswald=Oswald, sans-serif;Raleway=Raleway, sans-serif;',
     fontsize_formats: "8pt 10pt 11pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt",
