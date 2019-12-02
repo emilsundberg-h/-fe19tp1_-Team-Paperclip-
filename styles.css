@@ -126,6 +126,7 @@ body {
   -webkit-box-shadow: -20px 0px 20px 20px rgba(0,0,0,0.20);
   -moz-box-shadow: -20px 0px 20px 20px rgba(0,0,0,0.20);
   box-shadow: -20px 0px 20px 20px rgba(0,0,0,0.20);
+  overflow-y: hidden;
 }
 
 .menu::-webkit-scrollbar { 
