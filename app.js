@@ -872,9 +872,9 @@ const getDadJoke = async () => {
     scrollJoke.innerHTML = `<p>${JSON.stringify(myJson.joke)}</p>`;
 
     //Calculate scroll speed based on joke length
-    let scrollSpeed = Math.round(JSON.stringify(myJson.joke).length / 5);
+    let scrollSpeed = Math.round(JSON.stringify(myJson.joke).length / 7.5);
     document.querySelector('.scroll > p').style.animation =
-        `marquee ${(scrollSpeed > 7) ? scrollSpeed - 1 : scrollSpeed}s linear infinite`;
+        `marquee ${(scrollSpeed > 8) ? scrollSpeed - 1.5 : scrollSpeed}s linear infinite`;
 }
 
 logoQDiv.addEventListener("click", (e) => {
