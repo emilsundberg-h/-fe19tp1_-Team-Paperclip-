@@ -16,6 +16,6 @@ You can search for your notes with keywords,tags,star and title.
 To access the toolbar, click anywhere in the note editor.
 
 
-Contributors: Fredrik Andrén, Emil Sundberg, Tim Sildén, Johan Rottberg, Erik Calmfors.
+Contributors: Fredrik Andrén, Emil Sundberg, Tim Sildén, Johan Rottbers, Erik Calmfors.
 
 
