@@ -4,7 +4,7 @@
 
 tinymce.init({
     selector: '#note-body',
-    toolbar: 'bold italic strikethrough underline h2 h3 | bullist | numlist | aligncenter | blockquote | image | link | print | wordcount | Template | emoticons | fontselect| fontsizeselect |',
+    toolbar: 'bold italic strikethrough underline h2 h3 | bullist | numlist | aligncenter | blockquote | image | link | print | wordcount | emoticons | fontselect| fontsizeselect |',
     fixed_toolbar_container: '#note-toolbar',
     aligncenter: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'center' },
     toolbar_drawer: 'sliding',
@@ -17,20 +17,6 @@ tinymce.init({
     content_css: ['https://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans|Oswald|Raleway|Roboto&display=swap'],
     font_formats: 'Arial=arial;Baskervville=Baskervville, serif;Helvetica=helvetica,sans-serif;Courier=courier new,courier,monospace;Montserrat=Montserrat,sans-serif;Roboto=Roboto, sans-serif;Oswald=Oswald, sans-serif;Raleway=Raleway, sans-serif;',
     fontsize_formats: "8pt 10pt 11pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt",
-    setup: (editor) => {
-        editor.ui.registry.addButton('Template', {
-            icon: 'template',
-            tooltip: 'Choose Template',
-            id: 'template-buttton',
-            stateSelector: 'test-clas',
-            onAction: () => {
-                document.querySelector('.bg-modal').style.display = 'flex';
-                document.querySelector('.close').addEventListener('click', function () {
-                    document.querySelector('.bg-modal').style.display = 'none';
-                });
-            }
-        });
-    },
     //file picker image
     image_title: true,
     // enable automatic uploads of images represented by blob or data URIs
@@ -83,7 +69,6 @@ const quireIO = (function () {
                 let quireData = {
                     notes: [],
                     currentNote: null,
-                    templates: [],
                     tags: [],
                     settings: { theme }
                 };
@@ -1033,77 +1018,7 @@ themeCheckbox.addEventListener('change', e => {
     quireIO.updateData(quireData);
 });
 
-// template
-const templateContent = document.querySelector('.templateContent');
-
-templateContent.addEventListener('click', (e) => {
-
-    let pressedElement = e.target.id;
-
-    if (pressedElement === 'temp1') {
-
-        // then we create the new note (which returns its id)
-        let newNoteId = quireIO.createNote(`<h1 style="text-align: center;" data-mce-style="text-align: center;">Välkommen till din anteckningsbok Quire!</h1><p><br data-mce-bogus="1"></p><p style="text-align: center;" data-mce-style="text-align: center;"><img src="quire_notebook.jpg" alt="" width="308" height="308" data-mce-src="quire_notebook.jpg" style="background-color: var(--primary-background-color); color: var(--primary-text-color); font-family: Roboto, sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';" data-mce-style="background-color: var(--primary-background-color); color: var(--primary-text-color); font-family: Roboto, sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';"><br></p><p><br></p><p>Så kul att du hittat hit. Vi hoppas att Quire från och med nu kommer vara plattformen för alla dina anteckningar. Låt oss öka chanserna för detta genom att berätta om några funktioner.</p><p><br></p><p><strong>Autospara</strong></p><p>Allting sparas automatiskt så du behöver aldrig vara orolig över att någonting försvinner.&nbsp;</p><p><br></p><p><strong>Sök</strong></p><p>Du söker genom hela innehållet och inte bara titlar. Vill du bara söka på dina stjärnmarkerade inlägg, klicka på stjärnan i sökfunktionen.</p><p><br data-mce-bogus="1"></p><p><strong>Stjärnmarkering</strong></p><p>Välj ut dina speciella anteckningar genom att klicka i stjärnan. För att visa alla stjärnmarkeringar klickar du bara på stjärnan bredvid sökfältet.</p><p><br data-mce-bogus="1"></p><p><strong>Taggar</strong></p><p>Organisera dina anteckningar med hjälp av taggar. När du skapar en ny tagg kommer förslag på dina tidigare använda taggar.&nbsp;</p><p><br></p><p><strong>Dark mode</strong></p><p>Visst är det så att när man ligger där i sängen och vrider på sig, det är då man kommer på de allra smartaste sakerna och tecknar man inte ned dem, så är det bortglömt till morgonen. Var snäll mot dig själv och dina ögon genom att slå på dark mode när du skriver ned dina saker på småtimmarna. Du hittar dark mode under inställningar i vänsterkolumnen.</p><p><br></p><p><strong>Utskrift</strong></p><p>Digitala anteckningar i all ära, men behöver du skriva ut dina anteckningar behöver du inte vara orolig över att något annat än just den valda anteckningen skrivs ut.</p><p><br></p>`);
-
-        // followed by rendering the new note
-        renderNote(newNoteId);
-
-        // we then select the generated h1
-        tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
-
-        // re-render the notes list
-        renderNotesList();
-        document.querySelector('.bg-modal').style.display = 'none';
-    }
-
-    else if (pressedElement === 'temp2') {
-
-        // then we create the new note (which returns its id)
-        let newNoteId = quireIO.createNote('<h1>feel alive @<img src="https://internetifokus.se/wp-content/uploads/2015/06/KYH-logo.png" alt="Bildresultat för kyh logo" style="background-color: var(--primary-background-color); color: var(--primary-text-color); font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;;"></h1><p><span id="_mce_caret" data-mce-bogus="1" data-mce-type="format-caret"><em>bra mall!﻿</em></span></p>');
-        // followed by rendering the new note
-        renderNote(newNoteId);
-
-        // we then select the generated h1
-        tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
-
-        // re-render the notes list
-        renderNotesList();
-        document.querySelector('.bg-modal').style.display = 'none';
-    }
-
-    else if (pressedElement === 'temp3') {
-
-        // then we create the new note (which returns its id)
-        let newNoteId = quireIO.createNote('<h1>Im alive!</h1>\n<p>Start typing... 🖋️</p>');
-
-        // followed by rendering the new note
-        renderNote(newNoteId);
-
-        // we then select the generated h1
-        tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
-
-        // re-render the notes list
-        renderNotesList();
-        document.querySelector('.bg-modal').style.display = 'none';
-    }
-
-    else if (pressedElement === 'temp4') {
-
-        // then we create the new note (which returns its id)
-        let newNoteId = quireIO.createNote('<h1>Sweet</h1>\n<p>Start typing... 🖋️</p>');
-
-        // followed by rendering the new note
-        renderNote(newNoteId);
-
-        // we then select the generated h1
-        tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
-
-        // re-render the notes list
-        renderNotesList();
-        document.querySelector('.bg-modal').style.display = 'none';
-    }
-})
-
+// search
 const searchInput = document.querySelector('#search');
 const searchStarred = document.querySelector('#starred-search');
 
