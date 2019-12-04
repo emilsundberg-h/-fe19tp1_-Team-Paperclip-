@@ -707,7 +707,7 @@ background-color: var(--hover-color);
 .tox,
 .tox-toolbar__primary,
 .tox-editor-header,
-.toolbar__group {
+.toolbar__group, .tox-toolbar__overflow{
   background: var(--primary-background-color) !important;
   background-color: var(--primary-background-color) !important;
   color: var(--primary-text-color) !important;
