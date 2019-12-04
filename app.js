@@ -62,7 +62,8 @@ const quireIO = (function () {
                 // check preferred system theme
                 let theme = 'light';
                 if (window.matchMedia('(prefers-color-scheme)').media !== 'not all') {
-                    window.matchMedia("(prefers-color-scheme: dark)").matches ? theme = 'dark' : theme = 'light';
+
+                    if (window.matchMedia("(prefers-color-scheme: dark)").matches) theme = 'dark';
                 }
 
                 // create quire data object
@@ -183,7 +184,7 @@ const quireIO = (function () {
                 if (quireData.notes[noteIndex].tags.length) {
 
                     quireData.notes[noteIndex].tags.forEach(tagId => {
-                        quireIO.removeTag(tagId, noteId);
+                        this.removeTag(tagId, noteId);
                     });
 
                     // update data with the note removed from all tags
