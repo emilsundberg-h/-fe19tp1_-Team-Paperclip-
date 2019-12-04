@@ -363,8 +363,8 @@ const getNotePreview = noteBody => {
     })
 
     //Check length of preview
-    if (notePreview.trim().length < 1 && words.length > 4) {
-        noteTitle = `${words[0]} ${words[1]} ${words[2]} ${words[3]}...`;
+    if (notePreview.trim().length < 1 && words.length > 5) {
+        noteTitle = `${words[0]} ${words[1]} ${words[2]} ${words[3]} ${words[4]}...`;
         notePreview = `...${noteBody.substring(noteTitle.length - 2)}`;
     }
 
@@ -382,7 +382,7 @@ const getTagsHTML = tagsArray => {
 
     tagsArray.forEach(tag => {
 
-        html += 
+        html +=
             `<li class="tag ${tag.color}" data-tagid="${tag.id}">
                 <span>${tag.name}</span>
                 <button class="tag-delete-button">x</button>
@@ -420,82 +420,6 @@ const renderNote = noteId => {
         let quireData = quireIO.getData();
         quireData.currentNote = note.id;
         quireIO.updateData(quireData);
-    }
-}
-
-// render notes list
-const renderNotesList = () => {
-
-    //reset search function
-    document.querySelector('#starred-search').checked = false;
-    document.querySelector('#search').value = '';
-
-    let quireData = quireIO.getData();
-
-    let notesList = document.querySelector('.note-list');
-
-    // clear notes list
-    notesList.innerHTML = '';
-
-    if (!quireData.notes.length) {
-        notesList.innerHTML = '<div class="note-list-no-results"><i>No notes found... create one to get started!</i></div>';
-
-    } else {
-        // sort the array based on last updated date
-        quireData.notes.sort((noteA, noteB) => Number(noteB.lastUpdated) - Number(noteA.lastUpdated));
-
-        quireData.notes.forEach(note => {
-
-            // get note body
-            let noteBody = parseNoteBodyHTML(note.body);
-
-            // get title
-            let noteTitle = getNotePreview(noteBody)[0];
-
-            // get preview
-            let notePreview = getNotePreview(noteBody)[1];
-
-            // get date
-            let noteDateTitle = getNoteDateTitle(note.lastUpdated);
-            let noteDateISO = getNoteDateISO(note.lastUpdated);
-            let NoteDateRelative = getNoteDateRelative(noteDateISO);
-
-            // get tags
-            let noteTagsHTML = '';
-
-            if (note.tags.length > 0) {
-
-                let tags = quireIO.getTags(note.id);
-
-                noteTagsHTML = getTagsHTML(tags);
-            }
-
-            // render HTML
-            notesList.innerHTML +=
-                `<li class="note-list-item ${quireData.currentNote === note.id ? "note-list-item-current" : ""}" data-id="${note.id}">
-                    <div class="note-list-meta-container">
-                        <time datetime="${noteDateISO}" title="${noteDateTitle}" class="note-list-date">${NoteDateRelative}</time>
-                        <div class="note-list-icons">
-                            <button class="tag-button" title="Add tags"></button>
-                            <button class= "delete-button" title="Delete note"></button>
-                            <div class="confirm-div hide" id="confirm-${note.id}">
-                            <button class="confirm-buttons confirm" title="Confirm delete">Delete</button>
-                            <button class="confirm-buttons cancel" title="Cancel delete">Cancel</button>
-                            </div>
-                            <input type="checkbox" name="star-${note.id}" id="star-${note.id}" class="starred-checkbox" ${note.starred ? "checked" : ""}>
-                            <label for="star-${note.id}" title="${note.starred ? 'Unstar note' : 'Star note'}"></label>
-                        </div>
-                    </div>
-                    <a href="#" class="note-list-link"><h3 class="note-list-title">${noteTitle}</h3></a>
-                    <span class="note-list-preview">${notePreview}</span>
-                    <ul class="note-list-tags">${noteTagsHTML}</ul>
-                    <div class="note-list-add-tag-container hide" id="add-tag-container-${note.id}">
-                        <input class="tag-input" type="text" id="tag-input-${note.id}" placeholder="Add tag..." />
-                        <span class="tag-search-text"></span>
-                        <ul class="tag-search-suggestions"></ul>
-                    </div>
-                  </li>`;
-        });
     }
 }
 
@@ -601,7 +525,7 @@ window.addEventListener('load', e => {
 
     renderNote(quireData.currentNote);
 
-    renderNotesList();
+    searchNotesList();
 });
 
 // note body
@@ -668,16 +592,12 @@ notesList.addEventListener('click', e => {
                         tinyMCE.activeEditor.setContent('');
                     }
 
-
                     //Check if notelist is in search mode
-                    if (document.querySelector('#search').value == '' && !searchStarred.checked) {
-                        renderNotesList();
-                    } else {
-                        let searchStar = false;
-                        let searchString = document.querySelector('#search').value;
-                        if (searchStarred.checked) searchStar = true;
-                        searchNotesList(searchString, searchStar);
-                    }
+                    let searchStar = false;
+                    let searchString = document.querySelector('#search').value;
+                    if (searchStarred.checked) searchStar = true;
+                    searchNotesList(searchString, searchStar);
+
                 } else {
                     confirmButtons.classList.add('hide');
                     confirmButtons.classList.remove('animated');
@@ -849,7 +769,7 @@ const getDadJoke = async () => {
 
     //Show the joke in DOM
     scrollJoke.style.display = 'flex';
-    scrollJoke.innerHTML = `<p>${JSON.stringify(myJson.joke)}</p>`;
+    scrollJoke.innerHTML = `<p>${JSON.stringify(myJson.joke).replace(/(?:\\[rn]|[\r\n]|[\/\\]|[\s\s]+)+/g, ' ')}</p>`;
 
     //Calculate scroll speed based on joke length
     let scrollSpeed = Math.round(JSON.stringify(myJson.joke).length / 7.5);
@@ -899,7 +819,7 @@ navbarMenu.addEventListener('click', (e) => {
         case 'new-note': {
 
             // then we create the new note (which returns its id)
-            let newNoteId = quireIO.createNote('<h2>title...🖊</h2>');
+            let newNoteId = quireIO.createNote('<h2>title...</h2>');
 
             // followed by rendering the new note
             renderNote(newNoteId);
@@ -907,8 +827,10 @@ navbarMenu.addEventListener('click', (e) => {
             // we then select the generated h1
             tinymce.activeEditor.selection.select(tinymce.activeEditor.dom.select('h1')[0]);
 
-            // render notes lists
-            renderNotesList();
+            // reset search and render notes lists
+            document.querySelector('#starred-search').checked = false;
+            document.querySelector('#search').value = '';
+            searchNotesList();
 
             // hide menu on mobile
             document.querySelector('.menu').classList.remove('show');
@@ -939,8 +861,10 @@ navbarMenu.addEventListener('click', (e) => {
             document.querySelector('.settings-container').classList.add('hide');
             //document.querySelector('.statistics-container').classList.add('hide');
 
-            // render notes list
-            renderNotesList();
+            // reset search and render notes list
+            document.querySelector('#starred-search').checked = false;
+            document.querySelector('#search').value = '';
+            searchNotesList();
 
             break
         }
@@ -962,18 +886,6 @@ navbarMenu.addEventListener('click', (e) => {
             document.querySelector('.note-list-container').classList.add('hide');
 
             // TODO: implement statistcs
-
-            // Display a dad joke during the meantime
-            const getDadJoke = async () => {
-                const response = await fetch('https://icanhazdadjoke.com', { headers: { 'Accept': 'application/json' } });
-                const myJson = await response.json();
-                console.log(JSON.stringify(myJson));
-
-                document.querySelector('#dad-joke').textContent = JSON.stringify(myJson.joke);
-            }
-
-            getDadJoke();
-
             break
         }*/
 
@@ -1030,14 +942,14 @@ themeCheckbox.addEventListener('change', e => {
 const searchInput = document.querySelector('#search');
 const searchStarred = document.querySelector('#starred-search');
 
-//Listen to search event, enter or clear
+//Listen to search event: enter or clear
 searchInput.addEventListener('search', () => {
 
     if (searchStarred.checked || !searchInput.value == '') {
         searchString = searchInput.value;
         searchNotesList(searchString, searchStarred.checked);
     } else {
-        renderNotesList();
+        searchNotesList();
     }
 })
 
@@ -1080,10 +992,14 @@ const searchNotesList = (searchString = '', searchStar = false) => {
     quireData.notes.sort((noteA, noteB) => Number(noteB.lastUpdated) - Number(noteA.lastUpdated));
 
     let notesList = document.querySelector('.note-list');
+
+    // clear notes list
     notesList.innerHTML = '';
+
+    //create search array
     let arrSearchString = [];
 
-    //Split search into array
+    //Split search input and push into array
     if (searchString.includes(' ')) {
         arrSearchString.push(...searchString.trim().toLowerCase().split(' '));
     } else {
@@ -1092,6 +1008,7 @@ const searchNotesList = (searchString = '', searchStar = false) => {
 
     quireData.notes.forEach(note => {
 
+        // get note body
         let noteBody = parseNoteBodyHTML(note.body);
 
         // Check for separate search words
@@ -1116,7 +1033,7 @@ const searchNotesList = (searchString = '', searchStar = false) => {
             let tags = quireIO.getTags(note.id);
 
             noteTagsHTML = getTagsHTML(tags);
-            
+
             tags.forEach(tag => noteTagsList += tag.name);
         }
 
