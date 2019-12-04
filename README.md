@@ -18,4 +18,4 @@ To access the toolbar, click anywhere in the note editor.
 
 Contributors: Fredrik Andrén, Emil Sundberg, Tim Sildén, Johan Rottberg, Erik Calmfors.
 
-License: -fe19tp1_-Team-Paperclip-/lib/tinymce/license.txt 
+
