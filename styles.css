@@ -133,13 +133,13 @@ body {
   display: visible; 
 }
 
-.statistics-container {
+/*.statistics-container {
   padding: 0px 8px;
 }
 
 .settings-container {
   padding: 0px 8px;
-}
+}*/
 
 .hide {
   display: none !important;
@@ -765,9 +765,9 @@ div[role=application]{
   fill: var(--primary-text-color) !important;
 }
 
-.dad-joke {
+/*.dad-joke {
   margin: 0;
   border-left: 1px solid var(--secondary-text-color);
   padding-left: 10px;
   color: var(--secondary-text-color);
-}
+}*/

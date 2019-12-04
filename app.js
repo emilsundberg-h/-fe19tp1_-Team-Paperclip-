@@ -925,7 +925,7 @@ navbarMenu.addEventListener('click', (e) => {
 
             // hide other submenus
             document.querySelector('.settings-container').classList.add('hide');
-            document.querySelector('.statistics-container').classList.add('hide');
+            //document.querySelector('.statistics-container').classList.add('hide');
 
             break
         }
@@ -944,7 +944,7 @@ navbarMenu.addEventListener('click', (e) => {
 
             // hide other submenus
             document.querySelector('.settings-container').classList.add('hide');
-            document.querySelector('.statistics-container').classList.add('hide');
+            //document.querySelector('.statistics-container').classList.add('hide');
 
             // render notes list
             renderNotesList();
@@ -952,7 +952,7 @@ navbarMenu.addEventListener('click', (e) => {
             break
         }
 
-        case 'statistics': {
+        /*case 'statistics': {
 
             // toggle menu in mobile
             if (currentMenu === 'statistics') {
@@ -982,7 +982,7 @@ navbarMenu.addEventListener('click', (e) => {
             getDadJoke();
 
             break
-        }
+        }*/
 
         case 'settings': {
 
@@ -997,7 +997,7 @@ navbarMenu.addEventListener('click', (e) => {
             document.querySelector('.settings-container').classList.remove('hide');
 
             // hide other submenus
-            document.querySelector('.statistics-container').classList.add('hide');
+            //document.querySelector('.statistics-container').classList.add('hide');
             document.querySelector('.note-list-container').classList.add('hide');
 
             break
