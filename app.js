@@ -375,6 +375,23 @@ const getNotePreview = noteBody => {
     return arrNotePreview;
 }
 
+// get tags html
+const getTagsHTML = tagsArray => {
+
+    let html = '';
+
+    tagsArray.forEach(tag => {
+
+        html += 
+            `<li class="tag ${tag.color}" data-tagid="${tag.id}">
+                <span>${tag.name}</span>
+                <button class="tag-delete-button">x</button>
+            </li>`
+    });
+
+    return html;
+}
+
 // ############
 // Event handlers
 // ############
@@ -450,12 +467,7 @@ const renderNotesList = () => {
 
                 let tags = quireIO.getTags(note.id);
 
-                tags.forEach(tag => {
-                    noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
-                                      <span>${tag.name}</span>
-                                      <button class="tag-delete-button">x</button>
-                                  </li>`
-                });
+                noteTagsHTML = getTagsHTML(tags);
             }
 
             // render HTML
@@ -532,12 +544,7 @@ const updateNoteInNotesList = noteId => {
 
         let tags = quireIO.getTags(note.id);
 
-        tags.forEach(tag => {
-            noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
-                              <span>${tag.name}</span>
-                              <button class="tag-delete-button">x</button>
-                          </li>`
-        });
+        noteTagsHTML = getTagsHTML(tags);
     }
 
     tagList.innerHTML = noteTagsHTML;
@@ -1108,13 +1115,9 @@ const searchNotesList = (searchString = '', searchStar = false) => {
 
             let tags = quireIO.getTags(note.id);
 
-            tags.forEach(tag => {
-                noteTagsHTML += `<li class="tag ${tag.color}" data-tagid="${tag.id}">
-                                  <span>${tag.name}</span>
-                                  <button class="tag-delete-button">x</button>
-                              </li>`;
-                noteTagsList += tag.name;
-            });
+            noteTagsHTML = getTagsHTML(tags);
+            
+            tags.forEach(tag => noteTagsList += tag.name);
         }
 
         let checkTags = checkSearchWords(noteTagsList, arrSearchString);
