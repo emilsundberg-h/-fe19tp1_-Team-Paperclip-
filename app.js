@@ -376,25 +376,11 @@ const getNotePreview = noteBody => {
             notePreview = row;
     })
 
-    //Under construction
-    const isOverflown = (e) => {
-        return e.scrollHeight > e.clientHeight || e.scrollWidth > e.clientWidth;
-    }
-    // let titleLength
-
-    // let listPreview = document.querySelector('.note-list-item-current > a > h3')
-    // if (listPreview) {
-    //     if (isOverflown(listPreview) && !titleLength) {
-    //         titleLength = words.length
-    //         console.log(words.length)
-    //     }
-
-    // console.log(isOverflown(listPreview))
+    //Check length of preview
     if (notePreview.trim().length < 1 && words.length > 4) {
         noteTitle = `${words[0]} ${words[1]} ${words[2]} ${words[3]}...`;
         notePreview = `...${noteBody.substring(noteTitle.length - 2)}`;
     }
-    // }
 
     if (!noteTitle || noteTitle === ' ') noteTitle = 'No title...';
     if (!notePreview || notePreview.trim().length < 1) notePreview = '<i>No preview...</i>';
@@ -449,7 +435,7 @@ const renderNotesList = () => {
     notesList.innerHTML = '';
 
     if (!quireData.notes.length) {
-        notesList.innerHTML = '<div class="note-list-no-results"><i>No notes found... create one to get started!</></div>';
+        notesList.innerHTML = '<div class="note-list-no-results"><i>No notes found... create one to get started!</i></div>';
 
     } else {
         // sort the array based on last updated date
@@ -1121,7 +1107,9 @@ templateContent.addEventListener('click', (e) => {
 const searchInput = document.querySelector('#search');
 const searchStarred = document.querySelector('#starred-search');
 
+//Listen to search event, enter or clear
 searchInput.addEventListener('search', () => {
+
     if (searchStarred.checked || !searchInput.value == '') {
         searchString = searchInput.value;
         searchNotesList(searchString, searchStarred.checked);
@@ -1130,6 +1118,7 @@ searchInput.addEventListener('search', () => {
     }
 })
 
+//Listen to text input in search
 searchInput.addEventListener('keyup', (string) => {
 
     let searchString = '';
@@ -1140,6 +1129,7 @@ searchInput.addEventListener('keyup', (string) => {
     searchNotesList(searchString, searchStar);
 })
 
+//Listen to star in search
 searchStarred.addEventListener('click', (e) => {
 
     let searchString = searchInput.value;
@@ -1148,9 +1138,10 @@ searchStarred.addEventListener('click', (e) => {
     searchNotesList(searchString, searchStar);
 })
 
+//Search in text string with array of search words
 const checkSearchWords = (searchIn, arrSearchString) => {
 
-    let result = true
+    let result = true;
     arrSearchString.forEach((searchWord, i) => {
         if (searchWord === arrSearchString[i + 1] && i < arrSearchString.length) searchWord += ' ' + arrSearchString[i + 1];
         if (!searchIn.toLowerCase().includes(searchWord.trim())) result = false;
@@ -1158,6 +1149,7 @@ const checkSearchWords = (searchIn, arrSearchString) => {
     return result;
 }
 
+//Search notes and return result in DOM
 const searchNotesList = (searchString = '', searchStar = false) => {
 
     let quireData = quireIO.getData();
@@ -1168,6 +1160,7 @@ const searchNotesList = (searchString = '', searchStar = false) => {
     notesList.innerHTML = '';
     let arrSearchString = [];
 
+    //Split search into array
     if (searchString.includes(' ')) {
         arrSearchString.push(...searchString.trim().toLowerCase().split(' '));
     } else {
@@ -1211,6 +1204,7 @@ const searchNotesList = (searchString = '', searchStar = false) => {
         let checkTags = checkSearchWords(noteTagsList, arrSearchString);
         let checkSearchString = checkSearchWords(noteBody, arrSearchString);
 
+        //Print search result in DOM
         if ((checkSearchString && (note.starred == true || note.starred == searchStar))
             || (checkTags && (note.starred == true || note.starred == searchStar))) {
             notesList.innerHTML +=
@@ -1240,6 +1234,7 @@ const searchNotesList = (searchString = '', searchStar = false) => {
         }
     })
 
+    //Error message if no notes found
     if (notesList.innerHTML == '') {
         notesList.innerHTML =
             `<div class="note-list-no-results"><i>No ${(searchStar) ? "starred" : ""} notes 
