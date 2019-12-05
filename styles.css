@@ -6,7 +6,7 @@
   --primary-background-color: #fff;
   --secondary-background-color: #f1f1f1; /* 5% darker than background */ 
   --border-color: #d9d9d9; /* 15% darker than background */
-  --hover-color:  #e6e6e6; /* 10% darker than background */
+  --hover-color: #e6e6e6; /* 10% darker than background */
   --toolbar-height: 40px;
 }
 
@@ -15,7 +15,7 @@
   --primary-color-darker: #121a21;
   --primary-text-color: #fff;
   --secondary-text-color: #b3b3b3; /* 30% darker than primary text */
-  --primary-background-color:  #222f3e;
+  --primary-background-color: #222f3e;
   --secondary-background-color: #1b2631;
   --border-color: #090d10;
   --hover-color: #121921;
@@ -383,18 +383,18 @@ padding-right: 3px;
 
 .confirm{
   border-radius: 4px 0px 0px 4px;
-  background-color: rgb(224, 75, 75);
+  background-color: rgb(235, 40, 40);
 }
 .confirm:hover{
-  background-color: rgb(194, 45, 45);
+  background-color: rgb(255, 60, 60);
 }
 
 .cancel{
   border-radius: 0px 4px 4px 0px;
-  background-color: rgb(152, 152, 152);
+  background-color: rgb(150, 150, 150);
 }
 .cancel:hover{
-  background-color: rgb(122,122,122);
+  background-color: rgb(170,170,170);
 }
 .animated{
     animation: appear 0.1s;
@@ -448,6 +448,7 @@ padding-right: 3px;
     grid-column: 1 / 2;
     grid-row: 3 / 4;
     min-width: calc(100vw - 20px);
+    max-width: 100vw;
     border-top: 0px solid var(--border-color);
     border-right: none;
   }
@@ -511,7 +512,7 @@ padding-right: 3px;
 
   .note-toolbar {
     grid-column: 1 / 2;
-    /* width: 100%; */
+    max-width: 100vw; 
   }
 }
 
@@ -706,13 +707,16 @@ background-color: var(--hover-color);
 .tox,
 .tox-toolbar__primary,
 .tox-editor-header,
-.toolbar__group, .tox-toolbar__overflow{
+.toolbar__group, 
+.tox-toolbar__overflow,
+.tox-toolbar__group {
   background: var(--primary-background-color) !important;
   background-color: var(--primary-background-color) !important;
   color: var(--primary-text-color) !important;
   fill: var(--primary-text-color) !important;
   border: none !important;
 }
+
 div[role=application]{
       box-shadow: 2px 2px 5px rgba(0,0,0,0.20);  
 }
@@ -722,10 +726,3 @@ div[role=application]{
   color: var(--primary-text-color) !important;
   fill: var(--primary-text-color) !important;
 }
-
-/*.dad-joke {
-  margin: 0;
-  border-left: 1px solid var(--secondary-text-color);
-  padding-left: 10px;
-  color: var(--secondary-text-color);
-}*/
