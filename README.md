@@ -1,5 +1,5 @@
 # Quire 
-Quire is an amazing notebook editor built with [TinyMCE](https://www.tiny.cloud/features). Quire has many features such as autosave to local storage, search function, basic web accessibility, adding tags and favourite marks to your notes. Press the Quire logo to receive a surprise. 
+Quire is an amazing notebook editor built with [TinyMCE](https://www.tiny.cloud/features). Quire has many features such as autosave to local storage, powerful search function, basic web accessibility, adding tags and favourite marks to your notes. For an even better user experience and with the possibility to work offline on your smartphone you can add Quire to your home screen and use it as a PWA. On desktop - click the Quire logo for a surprise. 
 
 ## Prerequisites
 To fully use quire you'll need an internet connection (to fetch icons from font awesome).

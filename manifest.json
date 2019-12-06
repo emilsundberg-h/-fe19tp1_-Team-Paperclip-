@@ -1,21 +1,21 @@
 {
-    "short_name": "Quire",
-    "name": "Quire",
-    "description": "A notetaking app by Paperclip",
-    "icons": [
-      {
-        "src": "/assets/icon-192.png",
-        "type": "image/png",
-        "sizes": "192x192"
-      },
-      {
-        "src": "/assets/icon-512.png",
-        "type": "image/png",
-        "sizes": "512x512"
-      }
-    ],
-    "start_url": "/index.html",
-    "background_color": "#fff",
-    "theme_color": "#89b4a2",
-    "display": "standalone"
+  "short_name": "Quire",
+  "name": "Quire",
+  "description": "A notetaking app by Paperclip",
+  "icons": [
+    {
+      "src": "./assets/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#fff",
+  "theme_color": "#89b4a2",
+  "display": "standalone"
 }
